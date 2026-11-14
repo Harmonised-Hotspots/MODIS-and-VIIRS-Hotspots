@@ -1,0 +1,150 @@
+/* Globe & Map Scaffolding Styles */
+
+.globe-viewport {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #030509;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mapbox canvas mount container */
+.mapbox-canvas-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Atmospheric Space Backdrop */
+.atmosphere-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(14, 40, 80, 0.35) 0%, rgba(3, 5, 9, 0.98) 75%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Fallback / Mock 3D Globe Sphere */
+.globe-sphere {
+  position: relative;
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #1c3a60 0%, #0e223a 45%, #050d18 85%, #010307 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 90px rgba(56, 189, 248, 0.25), inset 0 0 70px rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.globe-atmosphere-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 55px rgba(56, 189, 248, 0.4);
+  pointer-events: none;
+}
+
+/* Pulsing Fire Embers */
+@keyframes flamePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 18px #ff4500, 0 0 35px rgba(255, 69, 0, 0.6);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 28px #ff7849, 0 0 50px rgba(255, 120, 73, 0.9);
+  }
+}
+
+.flame-ember {
+  animation: flamePulse 2.2s infinite ease-in-out;
+}
+
+/* Dashed Ghost Rings (Sensor Artifact / Filtered False Alarms) */
+@keyframes ghostSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ghost-ring {
+  animation: ghostSpin 20s linear infinite;
+}
+
+/* Floating Apple HUD Controls */
+.hud-zoom-bar {
+  position: absolute;
+  bottom: 240px;
+  left: 36px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(13, 20, 36, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.hud-pill-button {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-pill-button:hover {
+  color: #ffffff;
+}
+
+.hud-pill-button.active {
+  background: rgba(56, 189, 248, 0.18);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.hud-divider {
+  width: 1px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.hud-hint-text {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Mapbox Integration Banner (Shows when Mapbox token is not yet provided) */
+.mapbox-developer-badge {
+  position: absolute;
+  top: 80px;
+  left: 36px;
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 11px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

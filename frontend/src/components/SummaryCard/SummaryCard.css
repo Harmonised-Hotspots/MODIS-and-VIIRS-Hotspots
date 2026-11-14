@@ -1,0 +1,158 @@
+/* Summary Card Styles (Feature 5) */
+
+.summary-card {
+  position: absolute;
+  top: 80px;
+  right: 28px;
+  width: 326px;
+  background: rgba(11, 17, 32, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 35;
+  user-select: none;
+}
+
+.summary-header-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.summary-main-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  margin-top: 2px;
+}
+
+/* Hero Metric */
+.summary-hero-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-hero-number {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.summary-hero-number.uncalibrated {
+  color: #f87171;
+}
+
+.summary-hero-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+/* Anomaly Alert Box */
+.summary-anomaly-banner {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.anomaly-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.anomaly-desc {
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+/* Operational Metrics Rows */
+.summary-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.summary-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-metric-key {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-metric-value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.summary-metric-value.highlight {
+  color: #4ade80;
+}
+
+.summary-metric-value.danger {
+  color: #f87171;
+}
+
+/* Landcover Fuel Bar */
+.summary-fuels-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fuels-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.fuels-progress-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.fuel-slice-forest { width: 64%; background: #ef4444; }
+.fuel-slice-brush { width: 24%; background: #f59e0b; }
+.fuel-slice-agri { width: 12%; background: #38bdf8; }
+
+.fuels-legend-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+}
