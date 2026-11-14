@@ -6,6 +6,8 @@ import BurningCalendar from './components/BurningCalendar/BurningCalendar';
 import AOIPanel from './components/AOIPanel/AOIPanel';
 import MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';
 import './App.css';
+import HotspotMap from './GlobeViewer';
+
 
 function App() {
   const [isCalibrated, setIsCalibrated] = useState(true);
@@ -110,4 +112,6 @@ function App() {
   );
 }
 
-export default App;
+export default function App() {
+  return <HotspotMap />;
+}
