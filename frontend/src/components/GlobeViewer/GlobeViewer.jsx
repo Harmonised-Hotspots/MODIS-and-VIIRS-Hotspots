@@ -21,6 +21,8 @@ export default function GlobeViewer({
   onTierChange,
   onSelectCluster,
   mapboxAccessToken = null,
+  activeAOI = null,
+  onClearAOI,
 }) {
   // DOM element container where Mapbox canvas will be mounted
   const mapContainerRef = useRef(null);
@@ -118,14 +120,25 @@ export default function GlobeViewer({
       {/* 2. Atmospheric Space Backdrop */}
       <div className="atmosphere-glow" />
 
-      {/* 3. Developer Integration Guide Badge */}
-      <div className="mapbox-developer-badge">
-        <span style={{ color: '#38bdf8', fontWeight: 700 }}>Mapbox Plug-in Ready</span>
-        <span>• Mount ref linked to <code>mapContainerRef</code></span>
-        {mapboxAccessToken ? (
-          <span style={{ color: '#4ade80' }}>✓ Token Connected</span>
-        ) : (
-          <span style={{ color: '#f59e0b' }}>ℹ Rendered in Apple 3D Mock View</span>
+      {/* 3. Developer Integration Guide Badge & Active AOI Indicator */}
+      <div style={{ position: 'absolute', top: '80px', left: '36px', zIndex: 25, display: 'flex', gap: '10px' }}>
+        <div className="mapbox-developer-badge" style={{ position: 'static' }}>
+          <span style={{ color: '#38bdf8', fontWeight: 700 }}>Mapbox Plug-in Ready</span>
+          <span>• Mount ref linked</span>
+          {mapboxAccessToken ? (
+            <span style={{ color: '#4ade80' }}>✓ Token Connected</span>
+          ) : (
+            <span style={{ color: '#f59e0b' }}>ℹ Apple 3D View</span>
+          )}
+        </div>
+
+        {activeAOI && (
+          <div className="active-aoi-indicator" style={{ position: 'static' }}>
+            <span className="active-aoi-badge-dot" />
+            <span className="active-aoi-name">AOI: {activeAOI.name}</span>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>({activeAOI.areaKm2.toLocaleString()} km²)</span>
+            <button onClick={onClearAOI} className="active-aoi-clear-btn" title="Clear boundary filter">✕</button>
+          </div>
         )}
       </div>
 
@@ -147,6 +160,25 @@ export default function GlobeViewer({
             <path d="M 175,145 Q 230,135 270,185 T 240,290 T 185,250 Z" fill="#12243a" stroke="#38bdf8" strokeWidth="1" strokeOpacity="0.4" />
             <path d="M 240,300 Q 290,340 270,430 T 220,390 Z" fill="#12243a" stroke="#38bdf8" strokeWidth="1" strokeOpacity="0.4" />
           </svg>
+
+          {/* Active AOI Boundary Polygon on Globe */}
+          {activeAOI && (
+            <div
+              style={{
+                position: 'absolute',
+                left: '170px',
+                top: '150px',
+                width: '120px',
+                height: '120px',
+                borderRadius: '50%',
+                border: '2px dashed #38bdf8',
+                backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                boxShadow: '0 0 20px rgba(56, 189, 248, 0.35)',
+                pointerEvents: 'none',
+                zIndex: 4,
+              }}
+            />
+          )}
 
           {/* ACTIVE FIRE HOTSPOTS */}
           {SAMPLE_HOTSPOTS.map((spot) => {

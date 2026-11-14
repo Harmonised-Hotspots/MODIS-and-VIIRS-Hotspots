@@ -1,0 +1,322 @@
+/* Area of Interest (AOI) Panel Styles */
+
+.aoi-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 5, 9, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: aoiFadeIn 0.2s ease-out;
+}
+
+@keyframes aoiFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.aoi-modal-panel {
+  width: 480px;
+  background: rgba(13, 20, 36, 0.92);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: #ffffff;
+  user-select: none;
+}
+
+/* Modal Header */
+.aoi-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+
+.aoi-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aoi-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aoi-modal-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.aoi-modal-subtitle {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.aoi-close-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.aoi-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Tabs: Pre-set Preserves vs Custom Coordinates */
+.aoi-tabs-bar {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.aoi-tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aoi-tab-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+/* Presets List */
+.aoi-presets-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.aoi-preset-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aoi-preset-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.aoi-preset-card.selected {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+}
+
+.aoi-preset-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.aoi-preset-coords {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.aoi-preset-fires-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Coordinate Inputs Form */
+.aoi-coords-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aoi-input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.aoi-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aoi-field-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.aoi-text-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.aoi-text-input:focus {
+  border-color: #38bdf8;
+}
+
+.aoi-radius-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aoi-slider-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+/* Modal Actions Footer */
+.aoi-actions-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
+}
+
+.aoi-reset-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aoi-reset-btn:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.aoi-apply-btn {
+  background: #0284c7;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
+  transition: all 0.2s ease;
+}
+
+.aoi-apply-btn:hover {
+  background: #0369a1;
+}
+
+/* Active AOI Floating Indicator on Map */
+.active-aoi-indicator {
+  position: absolute;
+  top: 80px;
+  left: 36px;
+  z-index: 25;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1px solid #38bdf8;
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.2);
+  user-select: none;
+}
+
+.active-aoi-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.active-aoi-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.active-aoi-clear-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.active-aoi-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}

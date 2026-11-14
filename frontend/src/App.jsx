@@ -3,6 +3,7 @@ import TopNav from './components/TopNav/TopNav';
 import GlobeViewer from './components/GlobeViewer/GlobeViewer';
 import SummaryCard from './components/SummaryCard/SummaryCard';
 import BurningCalendar from './components/BurningCalendar/BurningCalendar';
+import AOIPanel from './components/AOIPanel/AOIPanel';
 import './App.css';
 
 function App() {
@@ -12,21 +13,26 @@ function App() {
   const [activeRegion, setActiveRegion] = useState('na');
   const [selectedCluster, setSelectedCluster] = useState(null);
 
+  // Feature 4: Area of Interest (AOI) State
+  const [isAOIOpen, setIsAOIOpen] = useState(false);
+  const [activeAOI, setActiveAOI] = useState(null);
+
   // One-click CSV export generator (Feature 6 requirement)
   const handleExportCSV = () => {
+    const aoiLabel = activeAOI ? activeAOI.name.replace(/[^a-zA-Z0-9]/g, '_') : activeRegion;
     const csvContent = [
-      'date,latitude,longitude,frp_megawatts,sensor,harmonized_confidence',
-      '2020-08-22,37.195,-119.261,1840.4,MODIS_VIIRS_SYNTH,98.2',
-      '2020-08-22,37.210,-119.280,1210.8,VIIRS_CROSS_CAL,95.6',
-      '2020-08-22,37.180,-119.240,890.1,MODIS_C61,92.0',
-      '2020-08-23,37.250,-119.310,1450.0,MODIS_VIIRS_SYNTH,97.1',
+      'date,latitude,longitude,frp_megawatts,sensor,aoi_filter,harmonized_confidence',
+      `2020-08-22,37.195,-119.261,1840.4,MODIS_VIIRS_SYNTH,${aoiLabel},98.2`,
+      `2020-08-22,37.210,-119.280,1210.8,VIIRS_CROSS_CAL,${aoiLabel},95.6`,
+      `2020-08-22,37.180,-119.240,890.1,MODIS_C61,${aoiLabel},92.0`,
+      `2020-08-23,37.250,-119.310,1450.0,MODIS_VIIRS_SYNTH,${aoiLabel},97.1`,
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `nasa_fire_harmonized_${activeRegion}_${selectedYear}.csv`);
+    link.setAttribute('download', `nasa_fire_harmonized_${aoiLabel}_${selectedYear}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -45,14 +51,19 @@ function App() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#030509]">
       
-      {/* 1. Top Navigation Bar with Harmonization Switch (Feature 3) */}
+      {/* 1. Top Navigation Bar with AOI Draw & Harmonization Switch */}
       <TopNav
         activeRegion={activeRegion}
-        onSelectRegion={(reg) => setActiveRegion(reg)}
+        onSelectRegion={(reg) => {
+          setActiveRegion(reg);
+          setActiveAOI(null);
+        }}
         isCalibrated={isCalibrated}
         onToggleCalibration={() => setIsCalibrated((prev) => !prev)}
         onExportCSV={handleExportCSV}
         onOpenMethodology={handleOpenMethodology}
+        onOpenAOI={() => setIsAOIOpen(true)}
+        activeAOI={activeAOI}
       />
 
       {/* 2. 3D Earth Globe & Hotspot Visualizer (Feature 1) */}
@@ -62,12 +73,14 @@ function App() {
         onTierChange={(tier) => setActiveTier(tier)}
         onSelectCluster={(spot) => setSelectedCluster(spot)}
         mapboxAccessToken={null} // Plug in Mapbox token here when ready
+        activeAOI={activeAOI}
+        onClearAOI={() => setActiveAOI(null)}
       />
 
       {/* 3. Plain-English Threat & Regional Summary Card (Feature 5) */}
       <SummaryCard
         activeYear={selectedYear}
-        activeRegion={activeRegion === 'na' ? 'California Sierra' : 'Global Area'}
+        activeRegion={activeAOI ? activeAOI.name : (activeRegion === 'na' ? 'California Sierra' : 'Global Area')}
         isCalibrated={isCalibrated}
       />
 
@@ -76,6 +89,18 @@ function App() {
         selectedYear={selectedYear}
         onSelectYear={(year) => setSelectedYear(year)}
         isCalibrated={isCalibrated}
+      />
+
+      {/* 5. Feature 4: Interactive Area of Interest (AOI) Panel */}
+      <AOIPanel
+        isOpen={isAOIOpen}
+        onClose={() => setIsAOIOpen(false)}
+        activeAOI={activeAOI}
+        onApplyAOI={(aoi) => {
+          setActiveAOI(aoi);
+          setActiveTier(2); // Automatically zoom to regional biome view when AOI is applied
+        }}
+        onClearAOI={() => setActiveAOI(null)}
       />
 
     </div>
