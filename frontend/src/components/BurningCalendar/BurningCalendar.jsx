@@ -4,7 +4,6 @@ import './BurningCalendar.css';
 import {
   YEARS,
   KEY_EPOCHS,
-  MACRO_TREND,
   MONTH_NAMES,
   DAY_NAMES,
   getCalendarGridForYear,
@@ -188,45 +187,38 @@ export default function BurningCalendar({
 
       {/* 3. 52-WEEK MATRIX GRID */}
       <div className="matrix-container">
-        {/* Month Labels (X-Axis) */}
-        <div className="month-axis-row">
-          {MONTH_NAMES.map((m, idx) => (
-            <div
-              key={idx}
-              className={`month-label ${m.includes('Peak') ? 'peak' : ''}`}
-            >
-              {m}
+        {/* 4 Day Rows: Mon, Wed, Fri, Sun (Y-Axis) */}
+        <div className={`calendar-grid`} >
+          {Array.from({length: 53}).map((_, c) => {
+            return <div style={{paddingTop: 25}}>
+              {Array.from({length: 7}).map((_, r) => {
+                const cell = cells[c * 7 + r];
+                return <>
+                  {cell?.date.day == 3 ?
+                    <div style={{position: 'absolute', top: 0}}>
+                      {MONTH_NAMES[cell.date.month - 1]}
+                    </div> : null}
+                  <div
+                    className={`day-cell level-${cell?.level}`}
+                    onMouseEnter={() => setHoveredCell(cell)}
+                    onMouseLeave={() => setHoveredCell(null)}
+                  >
+                    &nbsp;
+                  </div>
+                </>
+              })}
             </div>
-          ))}
+
+          })}
         </div>
 
-        {/* 4 Day Rows: Mon, Wed, Fri, Sun (Y-Axis) */}
-        {DAY_NAMES.map((dayName, rIdx) => {
-          const rowCells = cells.filter((c) => c.row === rIdx);
-          return (
-            <div key={dayName} className="day-grid-row">
-              <span className="day-axis-label">{dayName}</span>
-              <div className="day-cells-track">
-                {rowCells.map((c) => (
-                  <div
-                    key={c.id}
-                    onMouseEnter={() => setHoveredCell(c)}
-                    onMouseLeave={() => setHoveredCell(null)}
-                    className={`day-cell level-${c.level} ${c.isPeakDay ? 'level-4' : ''}`}
-                    title={`${c.dayName}: ${c.count} calibrated fires detected`}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
       </div>
 
       {/* 4. FOOTER INFO STRIP */}
       <div className="calendar-dock-footer">
         <span className={`footer-inspect-text ${hoveredCell ? 'active' : ''}`}>
           {hoveredCell
-            ? `Inspection: ${hoveredCell.dayName} • Outbreak Intensity: ${hoveredCell.count} Calibrated Hotspots (FRP Normalized)`
+            ? `Date: ${hoveredCell.date} • Level: ${hoveredCell.level}`
             : 'Hover or click any calendar day to inspect fire severity and exact satellite overpass counts'}
         </span>
         <span>NASA Earthdata FIRMS • Terra/Aqua MODIS & S-NPP/NOAA-20 VIIRS Cross-Calibration</span>
