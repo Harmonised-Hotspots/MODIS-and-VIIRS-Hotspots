@@ -2,6 +2,7 @@
 
 DUCKDB=~/AppData/Local/duckdb/cli/2.0.0/duckdb.exe
 
+mkdir data
 rm data/data2.duckdb
 $DUCKDB -no-stdin data/data2.duckdb
 $DUCKDB data/data2.duckdb -c "install spatial"
