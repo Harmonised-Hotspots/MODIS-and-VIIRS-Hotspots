@@ -27,3 +27,44 @@ body {
   padding: 2rem;
   text-align: center;
 }
+
+/* Printable Incident Briefing Media Styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .top-nav-bar,
+  .hud-zoom-bar,
+  .calendar-dock,
+  .mapbox-canvas-container,
+  .globe-sphere,
+  .aoi-overlay-backdrop {
+    display: none !important;
+  }
+  .methodology-overlay {
+    position: static !important;
+    background: none !important;
+  }
+  .methodology-drawer {
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .science-card {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #000000 !important;
+  }
+  .science-card-text {
+    color: #334155 !important;
+  }
+  .print-briefing-btn,
+  .methodology-close-btn {
+    display: none !important;
+  }
+}

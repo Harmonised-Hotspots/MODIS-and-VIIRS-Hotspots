@@ -4,6 +4,7 @@ import GlobeViewer from './components/GlobeViewer/GlobeViewer';
 import SummaryCard from './components/SummaryCard/SummaryCard';
 import BurningCalendar from './components/BurningCalendar/BurningCalendar';
 import AOIPanel from './components/AOIPanel/AOIPanel';
+import MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';
 import './App.css';
 
 function App() {
@@ -16,6 +17,9 @@ function App() {
   // Feature 4: Area of Interest (AOI) State
   const [isAOIOpen, setIsAOIOpen] = useState(false);
   const [activeAOI, setActiveAOI] = useState(null);
+
+  // Feature 6: Science & Methodology Drawer State
+  const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
 
   // One-click CSV export generator (Feature 6 requirement)
   const handleExportCSV = () => {
@@ -38,16 +42,6 @@ function App() {
     document.body.removeChild(link);
   };
 
-  const handleOpenMethodology = () => {
-    alert(
-      '🔬 NASA Cross-Calibration Science Summary:\n\n' +
-      '• Sensor Footprint Ratio: VIIRS (375m) is 7.1x smaller area than MODIS (1km).\n' +
-      '• Overlap Period: 2012–2026 (14 years of concurrent satellite observations).\n' +
-      '• Transfer Function: Calibrated FRP = f(VIIRS, MODIS) using regression kernel.\n' +
-      '• Ghost Embers: 3,480 sub-pixel noise false alarms filtered out.'
-    );
-  };
-
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#030509]">
       
@@ -61,7 +55,7 @@ function App() {
         isCalibrated={isCalibrated}
         onToggleCalibration={() => setIsCalibrated((prev) => !prev)}
         onExportCSV={handleExportCSV}
-        onOpenMethodology={handleOpenMethodology}
+        onOpenMethodology={() => setIsMethodologyOpen(true)}
         onOpenAOI={() => setIsAOIOpen(true)}
         activeAOI={activeAOI}
       />
@@ -101,6 +95,15 @@ function App() {
           setActiveTier(2); // Automatically zoom to regional biome view when AOI is applied
         }}
         onClearAOI={() => setActiveAOI(null)}
+      />
+
+      {/* 6. Feature 6: Science & Methodology Slide-Over Drawer */}
+      <MethodologyDrawer
+        isOpen={isMethodologyOpen}
+        onClose={() => setIsMethodologyOpen(false)}
+        activeYear={selectedYear}
+        activeRegion={activeAOI ? activeAOI.name : 'California Sierra'}
+        onExportCSV={handleExportCSV}
       />
 
     </div>
