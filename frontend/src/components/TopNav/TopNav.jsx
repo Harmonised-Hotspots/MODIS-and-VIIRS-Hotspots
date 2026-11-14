@@ -20,6 +20,8 @@ export default function TopNav({
   onToggleCalibration,
   onExportCSV,
   onOpenMethodology,
+  onOpenAOI,
+  activeAOI = null,
 }) {
   return (
     <header className="top-nav-bar">
@@ -52,6 +54,21 @@ export default function TopNav({
           />
           <kbd className="nav-search-kbd">⌘K</kbd>
         </div>
+
+        {/* Draw AOI Button */}
+        <button
+          onClick={onOpenAOI}
+          className="nav-action-btn"
+          style={{
+            borderColor: activeAOI ? '#38bdf8' : 'rgba(255, 255, 255, 0.14)',
+            color: activeAOI ? '#38bdf8' : '#f1f5f9',
+            background: activeAOI ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.07)',
+          }}
+          title="Draw or define Area of Interest bounding polygon"
+        >
+          <span>⬡</span>
+          <span>{activeAOI ? activeAOI.name : 'Draw AOI'}</span>
+        </button>
 
         {/* Region Pills */}
         <div className="nav-region-pills">
