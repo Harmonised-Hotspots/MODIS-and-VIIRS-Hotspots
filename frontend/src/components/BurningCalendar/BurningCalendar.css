@@ -168,6 +168,7 @@
 
 /* 3. 52-Week Matrix Grid */
 .matrix-container {
+  align-items: start;
   display: flex;
   flex-direction: column;
   gap: 3.5px;
@@ -175,8 +176,8 @@
 }
 
 .month-axis-row {
+  align-items: center;
   display: flex;
-  padding-left: 42px;
   font-size: 10px;
   font-weight: 600;
   color: #64748b;
@@ -210,17 +211,22 @@
   gap: 3px;
 }
 
+.calendar-grid {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
 .day-cell {
   flex: 1;
   height: 12px;
+  width: 12px;
   border-radius: 2.5px;
   cursor: pointer;
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .day-cell:hover {
-  transform: scaleY(1.35) scaleX(1.15);
-  z-index: 10;
   filter: brightness(1.25);
 }
 
@@ -231,8 +237,10 @@
 .day-cell.level-3 { background-color: #f59e0b; }
 .day-cell.level-4 {
   background-color: #ef4444;
+}
+.day-cell.is-peak-day {
   box-shadow: 0 0 8px #ef4444;
-  border: 1.5px solid #ffffff;
+  outline: 1.5px solid #ffffff;
 }
 
 /* 4. Footer Info Strip */
