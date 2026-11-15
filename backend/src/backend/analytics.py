@@ -51,13 +51,12 @@ def get_summary(
     aoi_lon=None,
     aoi_radius=None,
 ):
-    """Compute operational fire season metrics and median baseline anomalies for SummaryCard."""
+
     connection = get_db_connection()
     try:
         cursor = connection.cursor()
         aoi_clause, aoi_params = build_aoi_filter(aoi_lat, aoi_lon, aoi_radius)
 
-        # 1. Calibrated harmonized count (1km grid, sensitivity & schedule harmonized)
         calibrated_query = (
             f"SELECT COUNT(*) FROM {TABLE_NAME} "
             f"WHERE EXTRACT(year FROM acq_date) = ? AND is_ghost = FALSE {aoi_clause}"
@@ -65,7 +64,6 @@ def get_summary(
         cursor.execute(calibrated_query, [int(year)] + aoi_params)
         calibrated_count = cursor.fetchone()[0] or 0
 
-        # 2. Raw uncalibrated pixel count (VIIRS 375m + MODIS 1km before harmonization)
         viirs_query = (
             f"SELECT COUNT(*) FROM viirs WHERE EXTRACT(year FROM acq_date) = ? {aoi_clause}"
         )
@@ -81,7 +79,7 @@ def get_summary(
         raw_count = viirs_raw + modis_raw
         ghost_embers_filtered = max(0, raw_count - calibrated_count)
 
-        # 3. Worst Outbreak Day (highest fire count & FRP)
+
         worst_day_query = f"""
             SELECT acq_date, COUNT(*) AS count, ROUND(SUM(frp), 1) AS total_frp
             FROM {TABLE_NAME}
@@ -113,7 +111,6 @@ def get_summary(
                 "frp_mw": 0.0,
             }
 
-        # 4. Top 2 Peak Burning Months
         months_query = f"""
             SELECT EXTRACT(month FROM acq_date) AS m, COUNT(*) AS cnt
             FROM {TABLE_NAME}
@@ -132,7 +129,6 @@ def get_summary(
             )
             or "N/A"
         )
-
         # 5. Historical MEDIAN baseline for this exact AOI across all years
         baseline_query = f"""
             WITH years AS (

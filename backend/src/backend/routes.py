@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request, Response
+from backend.analytics import get_historical_comparison, get_summary
 from backend.data_extraction import (
-    get_hotspots,
-    get_calendar_matrix,
-    get_summary,
     export_hotspots_csv,
+    get_calendar_matrix,
+    get_hotspots,
 )
 
 api_bp = Blueprint("api", __name__)
@@ -18,6 +18,7 @@ def index():
             "/api/hotspots",
             "/api/calendar",
             "/api/summary",
+            "/api/analytics",
             "/api/export",
         ],
     })
@@ -66,17 +67,39 @@ def calendar_endpoint():
 @api_bp.route("/api/summary", methods=["GET"])
 def summary_endpoint():
     year = request.args.get("year", default=2024, type=int)
+    month = request.args.get("month", type=int)
     aoi_lat = request.args.get("aoi_lat", type=float)
     aoi_lon = request.args.get("aoi_lon", type=float)
     aoi_radius = request.args.get("aoi_radius", type=float)
 
     summary_data = get_summary(
         year=year,
+        month=month,
         aoi_lat=aoi_lat,
         aoi_lon=aoi_lon,
         aoi_radius=aoi_radius,
     )
     return jsonify(summary_data)
+
+
+@api_bp.route("/api/analytics", methods=["GET"])
+def analytics_endpoint():
+    year = request.args.get("year", default=2024, type=int)
+    month = request.args.get("month", type=int)
+    is_calibrated = request.args.get("calibrated", default="true").lower() == "true"
+    aoi_lat = request.args.get("aoi_lat", type=float)
+    aoi_lon = request.args.get("aoi_lon", type=float)
+    aoi_radius = request.args.get("aoi_radius", type=float)
+
+    analytics_data = get_historical_comparison(
+        year=year,
+        month=month,
+        is_calibrated=is_calibrated,
+        aoi_lat=aoi_lat,
+        aoi_lon=aoi_lon,
+        aoi_radius=aoi_radius,
+    )
+    return jsonify(analytics_data)
 
 
 @api_bp.route("/api/export", methods=["GET"])
