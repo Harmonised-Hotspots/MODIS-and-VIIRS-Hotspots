@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import TopNav from './components/TopNav/TopNav';
 import GlobeViewer from './components/GlobeViewer/GlobeViewer';
+import AnalyticsCard from './components/AnalyticsCard/AnalyticsCard';
 import SummaryCard from './components/SummaryCard/SummaryCard';
 import BurningCalendar from './components/BurningCalendar/BurningCalendar';
 import './App.css';
 
 function App() {
   const [selectedYear, setSelectedYear] = useState(2020);
+  const [selectedMonth, setSelectedMonth] = useState(null);
 
   const [activeAOI, setActiveAOI] = useState(null);
 
@@ -53,6 +55,10 @@ function App() {
         activeAOI={activeAOI}
         onClearAOI={() => setActiveAOI(null)}
       />
+      <AnalyticsCard
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
 
       {/* 3. Plain-English Threat & Regional Summary Card (Feature 5) */}
       <SummaryCard
@@ -63,6 +69,7 @@ function App() {
       <BurningCalendar
         selectedYear={selectedYear}
         onSelectYear={(year) => setSelectedYear(year)}
+        onSelectMonth={(month) => setSelectedMonth(month)}
       />
     </div>
   );

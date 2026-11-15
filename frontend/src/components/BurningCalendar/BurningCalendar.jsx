@@ -19,6 +19,7 @@ import {
 export default function BurningCalendar({
   selectedYear = 2020,
   onSelectYear,
+  onSelectMonth,
   isCalibrated = true,
 }) {
   const [hoveredCell, setHoveredCell] = useState(null);
@@ -80,6 +81,7 @@ export default function BurningCalendar({
                     className={`day-cell level-${cell?.level} ${cell?.isPeakDay ? 'peak-day' : ''}`}
                     onMouseEnter={() => setHoveredCell(cell)}
                     onMouseLeave={() => setHoveredCell(null)}
+                    onClick={() => onSelectMonth(date.month)}
                   >
                     &nbsp;
                   </div>
