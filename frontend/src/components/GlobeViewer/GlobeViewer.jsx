@@ -57,5 +57,3 @@ export default function HotspotMap() {
   // Positioning of the mapbox in website
   return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />;
 }
-
-
