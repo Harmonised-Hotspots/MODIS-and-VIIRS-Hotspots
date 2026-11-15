@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { ChevronDown } from 'lucide-react';
 import './BurningCalendar.css';
 import {
@@ -22,14 +22,18 @@ export default function BurningCalendar({
   isCalibrated = true,
 }) {
   const [hoveredCell, setHoveredCell] = useState(null);
+  const [cells, setCells] = useState([]);
 
-  // Generate deterministic calendar cells for selected year
-  const cells = getCalendarGridForYear(selectedYear);
-
-  // Handle year selection
-  const handleYearChange = (year) => {
-    if (onSelectYear) onSelectYear(year);
-  };
+  useEffect(() => {
+    (async () => {
+      const endpoint = `http://localhost:5000/api/calendar?year=${selectedYear}`;
+      const data = await fetch(endpoint).then(r => r.json());
+      setCells(data.filter(d => d.date).toSorted((a, b) => a.date > b.date ? 1 : -1).reduce((a, b) => {
+        a[b.date] = b;
+        return a;
+      }, {}));
+    })();
+  }, [selectedYear]);
 
   return (
     <div className="calendar-dock-container">
@@ -38,7 +42,7 @@ export default function BurningCalendar({
         <div className="calendar-title-group">
           <span className="calendar-main-title">Daily Burning Activity</span>
 
-          <select>
+          <select onChange={e => onSelectYear(e.target.value)} value={selectedYear}>
             {YEARS.map(year => <option key={year}>{year}</option>)}
           </select>
         </div>
@@ -65,14 +69,15 @@ export default function BurningCalendar({
                 if (c === 0) {
                   return  <Fragment key={index}><div className="calendar-day-name">{(index + 6) % 2 === 0 ? '' : DAY_NAMES[index + 7]}</div></Fragment>;
                 }
-                const cell = cells[index];
+                const date = Temporal.Now.plainDateISO().with({year: selectedYear, month: 1, day: 1}).add(`P${index}D`);
+                const cell = cells[date.toString()];
                 return <Fragment key={index}>
-                  {cell?.date.day == 3 ?
+                  {date.day === 1 && date.year === Number(selectedYear) ?
                     <div className="calendar-month-name">
-                      {MONTH_NAMES[cell.date.month - 1]}
+                      {MONTH_NAMES[date.month - 1]}
                     </div> : null}
                   <div
-                    className={`day-cell level-${cell?.level}`}
+                    className={`day-cell level-${cell?.level} ${cell?.isPeakDay ? 'peak-day' : ''}`}
                     onMouseEnter={() => setHoveredCell(cell)}
                     onMouseLeave={() => setHoveredCell(null)}
                   >
@@ -90,7 +95,7 @@ export default function BurningCalendar({
       <div className="calendar-dock-footer">
         <span className={`footer-inspect-text ${hoveredCell ? 'active' : ''}`}>
           {hoveredCell
-            ? `Date: ${hoveredCell.date} • Level: ${hoveredCell.level}`
+            ? `Date: ${hoveredCell.date} • Count: ${hoveredCell.count} • FRP: ${hoveredCell.total_frp} • Level: ${hoveredCell.level}`
             : ''}
         </span>
         <span>NASA Earthdata FIRMS - MODIS &amp; VIIRS NOAA-20 (2018-2025)</span>

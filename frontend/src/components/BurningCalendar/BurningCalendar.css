@@ -122,8 +122,14 @@
 .level-0 { background-color: #0e1626; }
 .level-1 { background-color: #075985; }
 .level-2 { background-color: #0284c7; }
-.level-3 { background-color: #f59e0b; }
-.level-4 { background-color: #ef4444; }
+.level-3 { background-color: #d59e0b; }
+.level-4 { background-color: #bf4444; }
+
+.peak-day {
+  position: relative;
+  background: red;
+  box-shadow: 0 0 8px red;
+}
 
 /* 4. Footer Info Strip */
 .calendar-dock-footer {
