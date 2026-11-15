@@ -1,16 +1,7 @@
 // Historical Multi-Year Burning Activity Dataset (2000–2026)
 // Cross-calibrated MODIS C6.1 (1km) & VIIRS VNP14IMGTDL (375m)
 
-export const YEARS = Array.from({ length: 27 }, (_, i) => 2000 + i);
-
-export const KEY_EPOCHS = [
-  { year: 2003, label: '2003 (MODIS Only)', desc: 'Cedar Fire Outbreak' },
-  { year: 2012, label: '2012 (Transition)', desc: 'VIIRS Satellite Launched' },
-  { year: 2018, label: '2018 (Camp Fire)', desc: 'Severe Drought Season' },
-  { year: 2020, label: '2020 (Peak Outbreak)', desc: 'Historical Record (Creek Fire)' },
-  { year: 2024, label: '2024 (Park Fire)', desc: 'Current Active Season' },
-  { year: 2026, label: '2026 (Present)', desc: 'Current Real-Time Feed' },
-];
+export const YEARS = Array.from({ length: 8 }, (_, i) => 2018 + i);
 
 // 25-Year Macro Trajectory Data (Raw uncalibrated vs Harmonized calibrated)
 export const MACRO_TREND = [
@@ -46,7 +37,7 @@ export function getCalendarGridForYear(year = 2020) {
   const cells = [];
   let i = 0; 
   while (date.until(nextYear).total('hours') > 0) {
-    cells.push({date, level: Math.floor((Math.sin(i % 7 / 7 * Math.PI) + 1) / 2 * 4) });
+    cells.push({date, level: Math.floor((Math.sin(i % 7 / 6 * Math.PI)) * 4) });
     date = date.add('P1D');
     i++;
   }
