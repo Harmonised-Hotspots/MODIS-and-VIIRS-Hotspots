@@ -12,7 +12,7 @@ export default function SummaryCard({
 
   useEffect(() => {
     (async () => {
-      const endpoint = `http://localhost:5000/api/summary?year=${activeYear}`;
+      const endpoint = `http://127.0.0.1:5000/api/summary?year=${activeYear}`;
       const data = await fetch(endpoint).then(r => r.json());
       console.log(data);
       setData(data);

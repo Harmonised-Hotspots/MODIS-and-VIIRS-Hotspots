@@ -26,7 +26,7 @@ export default function BurningCalendar({
 
   useEffect(() => {
     (async () => {
-      const endpoint = `http://localhost:5000/api/calendar?year=${selectedYear}`;
+      const endpoint = `http://127.0.0.1:5000/api/calendar?year=${selectedYear}`;
       const data = await fetch(endpoint).then(r => r.json());
       setCells(data.filter(d => d.date).toSorted((a, b) => a.date > b.date ? 1 : -1).reduce((a, b) => {
         a[b.date] = b;

@@ -25,7 +25,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/export?${params.toString()}`);
+      const response = await fetch(`http://127.0.0.1:5000/api/export?${params.toString()}`);
       if (!response.ok) throw new Error(`Export failed with status ${response.status}`);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
