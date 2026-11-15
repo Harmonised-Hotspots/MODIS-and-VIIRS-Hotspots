@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-uv run flask --app src/backend/main.py run
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKEND_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+unset VIRTUAL_ENV
+cd "$BACKEND_DIR"
+exec uv run flask --app backend.main run
