@@ -55,13 +55,14 @@
 }
 
 .nav-main-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   color: #ffffff;
   display: flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .nav-archive-badge {
