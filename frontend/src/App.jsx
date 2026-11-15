@@ -7,7 +7,6 @@ import AOIPanel from './components/AOIPanel/AOIPanel';
 import MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';
 import './App.css';
 
-
 function App() {
   const [isCalibrated, setIsCalibrated] = useState(true);
   const [activeTier, setActiveTier] = useState(1);
@@ -106,7 +105,6 @@ function App() {
         activeRegion={activeAOI ? activeAOI.name : 'California Sierra'}
         onExportCSV={handleExportCSV}
       />
-
     </div>
   );
 }
