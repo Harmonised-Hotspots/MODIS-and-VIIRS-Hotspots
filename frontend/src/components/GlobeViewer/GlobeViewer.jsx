@@ -10,13 +10,9 @@ const AOI_SOURCE_ID = 'aoi-highlight-source';
 const AOI_FILL_LAYER_ID = 'aoi-highlight-fill';
 const AOI_LINE_LAYER_ID = 'aoi-highlight-outline';
 
-// Dummy hotspot data for testing purposes
-const SAMPLE_HOTSPOTS = [
-  { latitude: 50.67, longitude: -120.33, frp: 36.3 },
-  { latitude: 53.92, longitude: -122.75, frp: 13.8 },
-  { latitude: 58.8, longitude: -122.7, frp: 56.5 },
-  { latitude: 51.05, longitude: -114.07, frp: 18.1 },
-];
+// To be changed - not implemented yet
+const SOURCE_ID = "hotspots";
+const LAYER_ID = "hotspot-display-layer";
 
 function buildAreaHighlightGeoJSON(aoi) {
   if (!aoi) {
@@ -82,17 +78,51 @@ function buildAreaHighlightGeoJSON(aoi) {
   };
 }
 
+// Modis, Viirs, and harmonized data all have different color shades
+// Darker shades will display firespots with high and low probability confidence
+const COLORS = {
+  MODIS: {high: '#b30000', low: '#fc8d59'},
+  VIIRS: {high: '#08519c', low: '#6baed6'},
+  HARMONIZED: {high: '#54278f', low: '#9e9ac8'}
+};
+// Fallback color means code is not properly intaking the h value (deosnt know whether dot is modis, viirs, or harmonized
+const ERR_COLOR = '#FFFFFF';
+
+// Color logic
+const COLOR_EXPRESSION = (h) => {
+   const palette = COLORS[h.source ?? 'MODIS'];
+   if (!palette) return ERR_COLOR;
+   // if confidence is over 75 categorize as high if under categorize as low
+    return h.confidence < 75 ? palette.low : palette.high;
+};
+
+// Creates an HTML div element to use as the map marker/point
+const createDot = (color) => {
+  const el = document.createElement('div');
+  el.style.width = '5px';
+  el.style.height = '5px';
+  el.style.borderRadius = '50%';
+  el.style.backgroundColor = color;
+  el.style.border = '1px solid rgba(0,0,0,0.4)';
+  el.style.cursor = 'pointer';
+  return el;
+};
+
 export default function HotspotMap({ activeAOI = null, onClearAOI }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const [hotspots] = useState(SAMPLE_HOTSPOTS);
   const [mapReady, setMapReady] = useState(false);
+  // Just added when changing markers to dots
+  const [selectedYear, setSelectedYear] = useState(2024); // or take as a prop
+  const [cells, setCells] = useState({});
 
   // Create globe/map and AOI highlight layers
   useEffect(() => {
     if (mapRef.current) return;
 
-    const map = new mapboxgl.Map({
+    // if no map is in effect create a new map
+    mapRef.current = new mapboxgl.Map({
       container: containerRef.current,
       style: 'mapbox://styles/keromei/cmwgso8ny00bv01sg5e7ydhpb',
       center: [-106, 56],
@@ -130,23 +160,41 @@ export default function HotspotMap({ activeAOI = null, onClearAOI }) {
       setMapReady(true);
     });
 
+    // set map to ready once loaded
+    mapRef.current.on('load', () => setMapReady(true));
+
     return () => {
       map.remove();
       mapRef.current = null;
+      setMapReady(false);
     };
   }, []);
 
   // Render fire hotspot markers
   useEffect(() => {
     if (!mapReady || !mapRef.current) return;
-    const markers = hotspots.map((h) =>
-      new mapboxgl.Marker({ color: '#ff4500' })
-        .setLngLat([h.longitude, h.latitude])
-        .setPopup(new mapboxgl.Popup().setText(`FRP: ${h.frp} MW`))
-        .addTo(mapRef.current)
-    );
-    return () => markers.forEach((m) => m.remove());
-  }, [mapReady, hotspots]);
+    // holds all created dots/hotspots
+    let hotspots = [];
+
+    // fetch data from api
+    (async () => {
+      const endpoint = `http://localhost:5000/api/hotspots?year=${selectedYear}`;
+      const json = await fetch(endpoint).then(r => r.json());
+
+      const HOTSPOT_RECORD = json.data?? [];
+
+      // Place markers from fetched data
+      hotspots = HOTSPOT_RECORD.map((h) =>
+          // Change markers to dot
+        new mapboxgl.Marker({ element: createDot(COLOR_EXPRESSION(h))})
+          .setLngLat([h.lon, h.lat])
+          .setPopup(new mapboxgl.Popup().setText(`FRP: ${h.frp} MW`))
+          .addTo(mapRef.current)
+      );
+    }) ();
+
+    return () => hotspots.forEach((m) => m.remove());
+  }, [mapReady, selectedYear]);
 
   // Highlight searched area without dropping a pin
   useEffect(() => {
