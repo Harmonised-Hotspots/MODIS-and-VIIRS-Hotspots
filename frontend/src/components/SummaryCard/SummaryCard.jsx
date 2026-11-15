@@ -1,39 +1,48 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Flame, Calendar, AlertTriangle, Filter } from 'lucide-react';
 import './SummaryCard.css';
 
 /**
- * Feature 5: Plain-English Regional Threat & Incident Summary Card
+ * Feature 5: Plain-English Incident Summary Card
  */
 export default function SummaryCard({
   activeYear = 2020,
-  activeRegion = 'California Sierra',
-  isCalibrated = true,
 }) {
+  const [data, setData] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      const endpoint = `http://localhost:5000/api/summary?year=${activeYear}`;
+      const data = await fetch(endpoint).then(r => r.json());
+      console.log(data);
+      setData(data);
+    })();
+  }, [activeYear]);
+
+
   // Calibrated counts vs uncalibrated raw VIIRS noise
-  const calibratedCount = activeYear === 2020 ? 1240 : (activeYear === 2024 ? 1180 : 1050);
-  const rawCount = activeYear >= 2012 ? calibratedCount * 3.8 : calibratedCount;
-  const ghostEmbersCount = Math.round(rawCount - calibratedCount);
-  const anomalyPercent = activeYear === 2020 ? 18 : (activeYear === 2024 ? 12 : 5);
+  const calibratedCount = data?.calibrated_count;
+  const rawCount = data?.raw_count;
+  const ghostEmbersCount = data?.ghost_embers_filtered;
+  const anomalyPercent = data?.anomaly_percent;
+  const worstDay = data?.worst_day;
+  console.log('worstDay', worstDay);
+
+  // TODO worst_day, peak_months, normal_baseline
 
   return (
     <aside className="summary-card">
       
-      {/* 1. Region & Active Year Header */}
+      {/* 1. Active Year Header */}
       <div>
-        <div className="summary-header-label">{activeRegion} Fire Season</div>
         <div className="summary-main-title">Year {activeYear} Summary</div>
       </div>
 
       {/* 2. Hero Calibrated vs Raw Metric */}
       <div className="summary-hero-metric">
-        <div className={`summary-hero-number ${!isCalibrated ? 'uncalibrated' : ''}`}>
-          {isCalibrated ? calibratedCount.toLocaleString() : Math.round(rawCount).toLocaleString()}
-        </div>
-        <div className="summary-hero-desc">
-          {isCalibrated
-            ? 'Calibrated fires detected this year (Footprint normalized)'
-            : '⚠️ Raw sensor pixels (340% VIIRS sensitivity jump unfiltered)'}
+        <div className={`summary-hero-number`}>
+          Harmonized: {calibratedCount?.toLocaleString()}<br/>
+          Raw: {rawCount ? Math.round(rawCount)?.toLocaleString() : ''}
         </div>
       </div>
 
@@ -41,10 +50,7 @@ export default function SummaryCard({
       <div className="summary-anomaly-banner">
         <div className="anomaly-title">
           <Flame className="w-4 h-4 text-amber-500" />
-          <span>▲ {anomalyPercent}% higher than 20-year normal</span>
-        </div>
-        <div className="anomaly-desc">
-          Normal baseline: ~1,050 calibrated fires per year for this biome.
+          <span>▲ {anomalyPercent}% compared to historical data</span>
         </div>
       </div>
 
@@ -52,19 +58,12 @@ export default function SummaryCard({
       <div className="summary-metrics-list">
         <div className="summary-metric-row">
           <span className="summary-metric-key">
-            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-            Peak Fire Months
-          </span>
-          <span className="summary-metric-value">August & September</span>
-        </div>
-
-        <div className="summary-metric-row">
-          <span className="summary-metric-key">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-            Worst Outbreak Day
+            Worst Day
           </span>
           <span className="summary-metric-value danger">
-            Aug 22 (Creek Fire Outbreak)
+            {worstDay?.label}<br/>
+            FRP: {worstDay?.frp_mw} MW
           </span>
         </div>
 
@@ -74,28 +73,8 @@ export default function SummaryCard({
             Ghost Embers Filtered
           </span>
           <span className="summary-metric-value highlight">
-            {isCalibrated
-              ? `✓ ${ghostEmbersCount.toLocaleString()} false-alarms`
-              : '0 (Filter Inactive)'}
+              {ghostEmbersCount?.toLocaleString()} false-alarms
           </span>
-        </div>
-      </div>
-
-      {/* 5. Fuel Types Burning */}
-      <div className="summary-fuels-section">
-        <div className="fuels-label-row">
-          <span>Fuel Classification</span>
-          <span style={{ color: '#cbd5e1' }}>Timber Forest 64%</span>
-        </div>
-        <div className="fuels-progress-bar">
-          <div className="fuel-slice-forest" title="Timber / Dense Forest (64%)" />
-          <div className="fuel-slice-brush" title="Brush / Chaparral (24%)" />
-          <div className="fuel-slice-agri" title="Agricultural / Grasslands (12%)" />
-        </div>
-        <div className="fuels-legend-row">
-          <span>🌲 Forest 64%</span>
-          <span>🌾 Brush 24%</span>
-          <span>🚜 Agri 12%</span>
         </div>
       </div>
 
