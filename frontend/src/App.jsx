@@ -69,11 +69,13 @@ function App() {
       <SummaryCard
         activeYear={selectedYear}
         selectedMonth={selectedMonth}
+        activeAOI={activeAOI}
       />
 
       {/* 4. 52-Week Burning Activity Calendar & Macro Dock (Feature 2) */}
       <BurningCalendar
         selectedYear={selectedYear}
+        activeAOI={activeAOI}
         onSelectYear={(year) => setSelectedYear(year)}
         onSelectMonth={(month) => setSelectedMonth(month)}
       />

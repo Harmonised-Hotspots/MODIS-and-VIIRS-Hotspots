@@ -21,27 +21,67 @@ export default function BurningCalendar({
   onSelectYear,
   onSelectMonth,
   isCalibrated = true,
+  activeAOI = null,
 }) {
   const [hoveredCell, setHoveredCell] = useState(null);
   const [cells, setCells] = useState([]);
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
-      const endpoint = `http://127.0.0.1:5000/api/calendar?year=${selectedYear}`;
-      const data = await fetch(endpoint).then(r => r.json());
-      setCells(data.filter(d => d.date).toSorted((a, b) => a.date > b.date ? 1 : -1).reduce((a, b) => {
-        a[b.date] = b;
-        return a;
-      }, {}));
+      const params = new URLSearchParams({
+        year: selectedYear,
+        calibrated: String(isCalibrated),
+      });
+
+      if (activeAOI) {
+        params.append('aoi_lat', activeAOI.lat);
+        params.append('aoi_lon', activeAOI.lon);
+        params.append('aoi_radius', activeAOI.radiusKm || 100);
+      }
+
+      const endpoint = `http://127.0.0.1:5000/api/calendar?${params.toString()}`;
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error(`Calendar fetch failed with status ${response.status}`);
+        }
+        const data = await response.json();
+        if (cancelled) return;
+
+        setCells(
+          data
+            .filter((d) => d.date)
+            .toSorted((a, b) => (a.date > b.date ? 1 : -1))
+            .reduce((a, b) => {
+              a[b.date] = b;
+              return a;
+            }, {})
+        );
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Calendar fetch failed:', err);
+          setCells({});
+        }
+      }
     })();
-  }, [selectedYear]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedYear, isCalibrated, activeAOI]);
 
   return (
     <div className="calendar-dock-container">
     <div className="calendar-dock">
       <div className="calendar-controls-row">
         <div className="calendar-title-group">
-          <span className="calendar-main-title">Daily Burning Activity</span>
+          <span className="calendar-main-title">
+            {activeAOI
+              ? `Daily Burning Activity — ${activeAOI.name}`
+              : 'Daily Burning Activity'}
+          </span>
 
           <select className="year-select" onChange={e => onSelectYear(e.target.value)} value={selectedYear}>
             {YEARS.map(year => <option key={year}>{year}</option>)}
@@ -78,7 +118,7 @@ export default function BurningCalendar({
                       {MONTH_NAMES[date.month - 1]}
                     </div> : null}
                   <div
-                    className={`day-cell level-${cell?.level} ${cell?.isPeakDay ? 'peak-day' : ''}`}
+                    className={`day-cell level-${cell?.level ?? 0} ${cell?.isPeakDay ? 'peak-day' : ''}`}
                     onMouseEnter={() => setHoveredCell(cell)}
                     onMouseLeave={() => setHoveredCell(null)}
                     onClick={() => onSelectMonth(date.month)}
