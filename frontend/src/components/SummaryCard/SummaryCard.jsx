@@ -41,7 +41,7 @@ export default function SummaryCard({
         <div className={`summary-hero-number`}>
           Harmonized: {calibratedCount?.toLocaleString()}<br/>
           Raw: {rawCount ? Math.round(rawCount)?.toLocaleString() : ''}<br/>
-          <span style={{fontSize: '16pt'}}>Baseline: {normalBaseline?.toLocaleString()}</span>
+          <span style={{fontSize: '20px'}}>Baseline: {normalBaseline?.toLocaleString()}</span>
         </div>
       </div>
 
