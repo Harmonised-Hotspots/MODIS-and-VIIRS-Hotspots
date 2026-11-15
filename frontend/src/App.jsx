@@ -59,6 +59,7 @@ function App() {
         mapboxAccessToken={null} // Plug in Mapbox token here when ready
         activeAOI={activeAOI}
         onClearAOI={() => setActiveAOI(null)}
+        selectedYear={selectedYear}
       />
       <AnalyticsCard
         selectedYear={selectedYear}

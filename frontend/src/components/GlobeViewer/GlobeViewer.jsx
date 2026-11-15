@@ -108,12 +108,11 @@ const createDot = (color) => {
   return el;
 };
 
-export default function HotspotMap({ activeAOI = null, onClearAOI }) {
+export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const [mapReady, setMapReady] = useState(false);
   // Just added when changing markers to dots
-  const [selectedYear, setSelectedYear] = useState(2024); // or take as a prop
   const [cells, setCells] = useState({});
 
   // Create globe/map and AOI highlight layers
