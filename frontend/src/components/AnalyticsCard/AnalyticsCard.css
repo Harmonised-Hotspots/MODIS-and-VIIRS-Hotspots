@@ -2,7 +2,7 @@
   position: absolute;
   top: 80px;
   left: 28px;
-  width: 326px;
+  width: 380px;
   background: rgba(11, 17, 32, 0.82);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -15,4 +15,23 @@
   z-index: 35;
   user-select: none;
 	color: white;
+}
+
+.chart-selector {
+  display: flex;
+  justify-content: center;
+}
+.chart-selector select {
+  font-family: inherit;
+  background: #202334;
+  color: white;
+  border: 1px solid grey;
+  border-radius: 3px;
+  font-size: 14px;
+  padding: 2px;
+}
+.trends {
+  background: #10214b;
+  border-radius: 6px;
+  padding: 10px;
 }

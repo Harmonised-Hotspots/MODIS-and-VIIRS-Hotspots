@@ -68,6 +68,7 @@ function App() {
       {/* 3. Plain-English Threat & Regional Summary Card (Feature 5) */}
       <SummaryCard
         activeYear={selectedYear}
+        selectedMonth={selectedMonth}
       />
 
       {/* 4. 52-Week Burning Activity Calendar & Macro Dock (Feature 2) */}

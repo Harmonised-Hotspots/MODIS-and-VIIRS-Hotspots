@@ -7,8 +7,10 @@ import './SummaryCard.css';
  */
 export default function SummaryCard({
   activeYear = 2020,
+  selectedMonth = 2020,
 }) {
   const [data, setData] = useState({});
+  const [analyticsData, setAnalyticsData] = useState({});
 
   useEffect(() => {
     (async () => {
@@ -17,6 +19,14 @@ export default function SummaryCard({
       setData(data);
     })();
   }, [activeYear]);
+
+  useEffect(() => {
+    (async () => {
+      const endpoint = `http://127.0.0.1:5000/api/analytics?year=${activeYear}&month=${selectedMonth}`;
+      const data = await fetch(endpoint).then((r) => r.json());
+      setAnalyticsData(data);
+    })();
+  }, [activeYear, selectedMonth]);
 
 
   // Calibrated counts vs uncalibrated raw VIIRS noise
@@ -48,7 +58,6 @@ export default function SummaryCard({
       {/* 3. Plain-English Human Anomaly Banner */}
       <div className="summary-anomaly-banner">
         <div className="anomaly-title">
-          <Flame className="w-4 h-4 text-amber-500" />
           <span>▲ {anomalyPercent}% compared to historical data</span>
         </div>
       </div>
@@ -83,6 +92,17 @@ export default function SummaryCard({
               {ghostEmbersCount?.toLocaleString()} false-alarms
           </span>
         </div>
+      </div>
+
+      <div style={{ fontSize: "16px", fontWeight: "bold" }}> Current Month</div>
+      <div>
+        Count: {analyticsData.selected_month?.current_count} <br />
+        FRP: {analyticsData.selected_month?.current_frp} <br />
+        FRP vs Median: {analyticsData.selected_month?.frp_pct_vs_median} <br />
+        Historical Median Count: {analyticsData.selected_month?.historical_median_count} <br />
+        Historical Median FRP: {analyticsData.selected_month?.historical_median_frp} <br />
+        Is Peak Month: {analyticsData.selected_month?.is_peak_month ? "yes" : "no"} <br />
+        Percent vs Median: {analyticsData.selected_month?.pct_vs_median} <br />
       </div>
 
     </aside>
