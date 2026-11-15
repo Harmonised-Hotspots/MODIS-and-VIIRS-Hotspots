@@ -68,11 +68,7 @@ export default function TopNav({
         <div className="nav-title-group">
           <div className="nav-main-title">
             Harmonized Canadian Fire Observatory
-            <span className="nav-archive-badge">2018–2025 Data Archive</span>
           </div>
-          <span className="nav-subtitle">
-            Data from NASA MODIS and VIIRS NOAA-20
-          </span>
         </div>
       </div>
 
