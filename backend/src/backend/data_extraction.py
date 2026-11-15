@@ -5,7 +5,7 @@ from pathlib import Path
 import duckdb
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-DB_PATH = str(BASE_DIR / "data" / "data2.duckdb")
+DB_PATH = str(BASE_DIR / "data" / "data.duckdb")
 TABLE_NAME = "modis"
 
 

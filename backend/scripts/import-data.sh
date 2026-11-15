@@ -28,7 +28,7 @@ for i in `seq 0 $(($NUM_YEARS - 1))`; do
 	filename="modis_${year}_Canada.csv"
 	if [ ! -e "$filename" ]; then
 		echo "downloading $filename..."
-		wget -q "https://firms.modaps.eosdis.nasa.gov/data/country/modis/$year/$filename"
+		curl -s "https://firms.modaps.eosdis.nasa.gov/data/country/modis/$year/$filename" -o "$filename"
 	else
 		echo "$filename already exists"
 	fi
@@ -36,7 +36,7 @@ for i in `seq 0 $(($NUM_YEARS - 1))`; do
 	filename="viirs-jpss1_${year}_Canada.csv"
 	if [ ! -e "$filename" ]; then
 		echo "downloading $filename..."
-		wget -q "https://firms.modaps.eosdis.nasa.gov/data/country/viirs-jpss1/$year/$filename"
+		curl -s "https://firms.modaps.eosdis.nasa.gov/data/country/viirs-jpss1/$year/$filename" -o "$filename"
 	else
 		echo "$filename already exists"
 	fi

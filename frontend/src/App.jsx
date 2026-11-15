@@ -116,9 +116,10 @@ function App() {
         activeRegion={activeAOI ? activeAOI.name : 'California Sierra'}
         onExportCSV={handleExportCSV}
       />
-
     </div>
   );
 }
 
-export default App;
+export default function () {
+  return <App />;
+}
