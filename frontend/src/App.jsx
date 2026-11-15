@@ -6,7 +6,6 @@ import BurningCalendar from './components/BurningCalendar/BurningCalendar';
 import AOIPanel from './components/AOIPanel/AOIPanel';
 import MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';
 import './App.css';
-import HotspotMap from './GlobeViewer';
 
 
 function App() {
@@ -112,6 +111,6 @@ function App() {
   );
 }
 
-export default function App() {
-  return <HotspotMap />;
+export default function () {
+  return <App />;
 }
