@@ -14,7 +14,6 @@ export default function SummaryCard({
     (async () => {
       const endpoint = `http://127.0.0.1:5000/api/summary?year=${activeYear}`;
       const data = await fetch(endpoint).then(r => r.json());
-      console.log(data);
       setData(data);
     })();
   }, [activeYear]);
@@ -26,9 +25,8 @@ export default function SummaryCard({
   const ghostEmbersCount = data?.ghost_embers_filtered;
   const anomalyPercent = data?.anomaly_percent;
   const worstDay = data?.worst_day;
-  console.log('worstDay', worstDay);
-
-  // TODO worst_day, peak_months, normal_baseline
+  const normalBaseline = data?.normal_baseline;
+  const peakMonths = data?.peak_months;
 
   return (
     <aside className="summary-card">
@@ -42,7 +40,8 @@ export default function SummaryCard({
       <div className="summary-hero-metric">
         <div className={`summary-hero-number`}>
           Harmonized: {calibratedCount?.toLocaleString()}<br/>
-          Raw: {rawCount ? Math.round(rawCount)?.toLocaleString() : ''}
+          Raw: {rawCount ? Math.round(rawCount)?.toLocaleString() : ''}<br/>
+          <span style={{fontSize: '16pt'}}>Baseline: {normalBaseline?.toLocaleString()}</span>
         </div>
       </div>
 
@@ -58,12 +57,20 @@ export default function SummaryCard({
       <div className="summary-metrics-list">
         <div className="summary-metric-row">
           <span className="summary-metric-key">
+            Peak Months
+          </span>
+          <span className="summary-metric-value danger">
+            {peakMonths}
+          </span>
+        </div>
+        <div className="summary-metric-row">
+          <span className="summary-metric-key">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
             Worst Day
           </span>
           <span className="summary-metric-value danger">
             {worstDay?.label}<br/>
-            FRP: {worstDay?.frp_mw} MW
+            FRP: {worstDay?.frp_mw.toLocaleString()} MW
           </span>
         </div>
 
