@@ -1,0 +1,48 @@
+Index: frontend/src/App.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React, { useState } from 'react';\r\nimport TopNav from './components/TopNav/TopNav';\r\nimport GlobeViewer from './components/GlobeViewer/GlobeViewer';\r\nimport SummaryCard from './components/SummaryCard/SummaryCard';\r\nimport BurningCalendar from './components/BurningCalendar/BurningCalendar';\r\nimport AOIPanel from './components/AOIPanel/AOIPanel';\r\nimport MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';\r\nimport './App.css';\r\nimport HotspotMap from './GlobeViewer';\r\n\r\n\r\nfunction App() {\r\n  const [isCalibrated, setIsCalibrated] = useState(true);\r\n  const [activeTier, setActiveTier] = useState(1);\r\n  const [selectedYear, setSelectedYear] = useState(2020);\r\n  const [activeRegion, setActiveRegion] = useState('na');\r\n  const [selectedCluster, setSelectedCluster] = useState(null);\r\n\r\n  // Feature 4: Area of Interest (AOI) State\r\n  const [isAOIOpen, setIsAOIOpen] = useState(false);\r\n  const [activeAOI, setActiveAOI] = useState(null);\r\n\r\n  // Feature 6: Science & Methodology Drawer State\r\n  const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);\r\n\r\n  // One-click CSV export generator (Feature 6 requirement)\r\n  const handleExportCSV = () => {\r\n    const aoiLabel = activeAOI ? activeAOI.name.replace(/[^a-zA-Z0-9]/g, '_') : activeRegion;\r\n    const csvContent = [\r\n      'date,latitude,longitude,frp_megawatts,sensor,aoi_filter,harmonized_confidence',\r\n      `2020-08-22,37.195,-119.261,1840.4,MODIS_VIIRS_SYNTH,${aoiLabel},98.2`,\r\n      `2020-08-22,37.210,-119.280,1210.8,VIIRS_CROSS_CAL,${aoiLabel},95.6`,\r\n      `2020-08-22,37.180,-119.240,890.1,MODIS_C61,${aoiLabel},92.0`,\r\n      `2020-08-23,37.250,-119.310,1450.0,MODIS_VIIRS_SYNTH,${aoiLabel},97.1`,\r\n    ].join('\\n');\r\n\r\n    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });\r\n    const url = URL.createObjectURL(blob);\r\n    const link = document.createElement('a');\r\n    link.href = url;\r\n    link.setAttribute('download', `nasa_fire_harmonized_${aoiLabel}_${selectedYear}.csv`);\r\n    document.body.appendChild(link);\r\n    link.click();\r\n    document.body.removeChild(link);\r\n  };\r\n\r\n  return (\r\n    <div className=\"relative w-screen h-screen overflow-hidden bg-[#030509]\">\r\n      \r\n      {/* 1. Top Navigation Bar with AOI Draw & Harmonization Switch */}\r\n      <TopNav\r\n        activeRegion={activeRegion}\r\n        onSelectRegion={(reg) => {\r\n          setActiveRegion(reg);\r\n          setActiveAOI(null);\r\n        }}\r\n        isCalibrated={isCalibrated}\r\n        onToggleCalibration={() => setIsCalibrated((prev) => !prev)}\r\n        onExportCSV={handleExportCSV}\r\n        onOpenMethodology={() => setIsMethodologyOpen(true)}\r\n        onOpenAOI={() => setIsAOIOpen(true)}\r\n        activeAOI={activeAOI}\r\n      />\r\n\r\n      {/* 2. 3D Earth Globe & Hotspot Visualizer (Feature 1) */}\r\n      <GlobeViewer\r\n        isCalibrated={isCalibrated}\r\n        activeTier={activeTier}\r\n        onTierChange={(tier) => setActiveTier(tier)}\r\n        onSelectCluster={(spot) => setSelectedCluster(spot)}\r\n        mapboxAccessToken={null} // Plug in Mapbox token here when ready\r\n        activeAOI={activeAOI}\r\n        onClearAOI={() => setActiveAOI(null)}\r\n      />\r\n\r\n      {/* 3. Plain-English Threat & Regional Summary Card (Feature 5) */}\r\n      <SummaryCard\r\n        activeYear={selectedYear}\r\n        activeRegion={activeAOI ? activeAOI.name : (activeRegion === 'na' ? 'California Sierra' : 'Global Area')}\r\n        isCalibrated={isCalibrated}\r\n      />\r\n\r\n      {/* 4. 52-Week Burning Activity Calendar & Macro Dock (Feature 2) */}\r\n      <BurningCalendar\r\n        selectedYear={selectedYear}\r\n        onSelectYear={(year) => setSelectedYear(year)}\r\n        isCalibrated={isCalibrated}\r\n      />\r\n\r\n      {/* 5. Feature 4: Interactive Area of Interest (AOI) Panel */}\r\n      <AOIPanel\r\n        isOpen={isAOIOpen}\r\n        onClose={() => setIsAOIOpen(false)}\r\n        activeAOI={activeAOI}\r\n        onApplyAOI={(aoi) => {\r\n          setActiveAOI(aoi);\r\n          setActiveTier(2); // Automatically zoom to regional biome view when AOI is applied\r\n        }}\r\n        onClearAOI={() => setActiveAOI(null)}\r\n      />\r\n\r\n      {/* 6. Feature 6: Science & Methodology Slide-Over Drawer */}\r\n      <MethodologyDrawer\r\n        isOpen={isMethodologyOpen}\r\n        onClose={() => setIsMethodologyOpen(false)}\r\n        activeYear={selectedYear}\r\n        activeRegion={activeAOI ? activeAOI.name : 'California Sierra'}\r\n        onExportCSV={handleExportCSV}\r\n      />\r\n\r\n    </div>\r\n  );\r\n}\r\n\r\nexport default function App() {\r\n  return <HotspotMap />;\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+--- a/frontend/src/App.jsx	(revision bfe6ed229cbaef7d21cb32644523aff7d8ba29d1)
++++ b/frontend/src/App.jsx	(date 1794704821898)
+@@ -6,7 +6,6 @@
+ import AOIPanel from './components/AOIPanel/AOIPanel';
+ import MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';
+ import './App.css';
+-import HotspotMap from './GlobeViewer';
+ 
+ 
+ function App() {
+@@ -112,6 +111,6 @@
+   );
+ }
+ 
+-export default function App() {
+-  return <HotspotMap />;
+-}
++export default function (){
++    return <App/>
++}
+\ No newline at end of file
+Index: frontend/src/components/GlobeViewer/GlobeViewer.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React, { useRef, useState, useEffect } from 'react';\r\nimport './GlobeViewer.css';\r\nimport mapboxgl from 'mapbox-gl';\r\nimport 'mapbox-gl/dist/mapbox-gl.css';\r\n\r\n// import access token via env file\r\nmapboxgl.accessToken = 'pk.eyJ1Ijoia2Vyb21laSIsImEiOiJjbXdiZGlxdWEwMWFnMzBxNTdjcTJocnVkIn0.jDQs_EmmcfL3xt3OvHs0nQ';\r\n\r\n// Dummy hotspot data for testing purposes\r\nconst SAMPLE_HOTSPOTS = [\r\n  { latitude: 50.67, longitude: -120.33, frp: 36.3 },\r\n  { latitude: 53.92, longitude: -122.75, frp: 13.8 },\r\n  { latitude: 58.8, longitude: -122.7, frp: 56.5 },\r\n  { latitude: 51.05, longitude: -114.07, frp: 18.1 },\r\n];\r\n\r\n//\r\nexport default function HotspotMap() {\r\n  const containerRef = useRef(null);\r\n  const mapRef = useRef(null);\r\n  const [hotspots, setHotspots] = useState(SAMPLE_HOTSPOTS);\r\n  const [mapReady, setMapReady] = useState(false);\r\n\r\n  // Effect to create globe map\r\n  useEffect(() => {\r\n    // checks if a map is already in effect\r\n    if (mapRef.current) return;\r\n    // if no map is in effect create a new map\r\n    mapRef.current = new mapboxgl.Map({\r\n      container: containerRef.current,\r\n      style: 'mapbox://styles/keromei/cmwgso8ny00bv01sg5e7ydhpb',\r\n      center: [-106, 56],\r\n      zoom: 3,\r\n    });\r\n\r\n    // set map to ready once loaded\r\n    mapRef.current.on('load', () => setMapReady(true));\r\n    return () => {\r\n      mapRef.current?.remove();\r\n      mapRef.current = null;\r\n    };\r\n  }, []);\r\n\r\n  // Effect to implement hotspots from live data\r\n  // Runs when map is ready and live data is updated\r\n  useEffect(() => {\r\n    if (!mapReady) return;\r\n    const markers = hotspots.map((h) =>\r\n      new mapboxgl.Marker({ color: '#ff4500' })\r\n        .setLngLat([h.longitude, h.latitude])\r\n        .setPopup(new mapboxgl.Popup().setText(`FRP: ${h.frp} MW`))\r\n        .addTo(mapRef.current)\r\n    );\r\n    return () => markers.forEach((m) => m.remove());\r\n  }, [mapReady, hotspots]);\r\n\r\n  // Positioning of the mapbox in website\r\n  return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />;\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/frontend/src/components/GlobeViewer/GlobeViewer.jsx b/frontend/src/components/GlobeViewer/GlobeViewer.jsx
+--- a/frontend/src/components/GlobeViewer/GlobeViewer.jsx	(revision bfe6ed229cbaef7d21cb32644523aff7d8ba29d1)
++++ b/frontend/src/components/GlobeViewer/GlobeViewer.jsx	(date 1794721368666)
+@@ -56,6 +56,4 @@
+ 
+   // Positioning of the mapbox in website
+   return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />;
+-}
+-
+-
++}
+\ No newline at end of file

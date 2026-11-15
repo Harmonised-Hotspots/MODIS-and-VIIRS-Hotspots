@@ -63,7 +63,14 @@ def get_hotspots(
                 pixel_count,
                 is_ghost,
                 sensor,
-                type
+                type,
+                confidence,
+                scan,
+                track,
+                type,
+                satellite, 
+                instrument,
+                bright_t31
             FROM {TABLE_NAME}
             WHERE 1=1
         """

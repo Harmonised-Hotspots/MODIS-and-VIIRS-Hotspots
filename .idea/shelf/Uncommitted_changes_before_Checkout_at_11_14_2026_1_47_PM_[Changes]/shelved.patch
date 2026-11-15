@@ -1,0 +1,73 @@
+Index: frontend/src/components/GlobeViewer/GlobeViewer.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import React, { useRef, useState, useEffect } from 'react';\r\nimport './GlobeViewer.css';\r\nimport { ZOOM_TIERS, SAMPLE_HOTSPOTS } from '../../data/mockHotspots';\r\n\r\n/**\r\n * GlobeViewer Component\r\n * \r\n * Scaffolding for 3D Earth Globe & Hotspot Visualizer.\r\n * Designed so your teammate can easily plug in Mapbox GL JS / MapLibre.\r\n * \r\n * Props:\r\n * - isCalibrated: boolean (True = show harmonized fires only, False = show raw + ghost embers)\r\n * - activeTier: 1 | 2 | 3 (1: Orbit Globe, 2: Regional Biome, 3: Tactical Ridge)\r\n * - onTierChange: function(tierId)\r\n * - onSelectCluster: function(hotspot)\r\n * - mapboxAccessToken: string (optional, inject token to activate live Mapbox map)\r\n */\r\nexport default function GlobeViewer({\r\n  isCalibrated = true,\r\n  activeTier = 1,\r\n  onTierChange,\r\n  onSelectCluster,\r\n  mapboxAccessToken = null,\r\n  activeAOI = null,\r\n  onClearAOI,\r\n}) {\r\n  // DOM element container where Mapbox canvas will be mounted\r\n  const mapContainerRef = useRef(null);\r\n\r\n  // Reference to live Mapbox GL Map instance\r\n  const mapInstanceRef = useRef(null);\r\n\r\n  // Local state for zoom tier if not controlled externally\r\n  const [currentTier, setCurrentTier] = useState(activeTier);\r\n  const [selectedHotspot, setSelectedHotspot] = useState(SAMPLE_HOTSPOTS[0]);\r\n\r\n  // Sync prop changes\r\n  useEffect(() => {\r\n    if (activeTier) {\r\n      setCurrentTier(activeTier);\r\n    }\r\n  }, [activeTier]);\r\n\r\n  /* =========================================================================\r\n   * \uD83D\uDE80 MAPBOX PLUG-IN HOOK (READY FOR YOUR TEAMMATE)\r\n   * =========================================================================\r\n   * When ready to connect Mapbox:\r\n   * 1. Run: npm install mapbox-gl\r\n   * 2. Pass your token via props or set here: mapboxgl.accessToken = 'pk.xxx'\r\n   * 3. Uncomment the block below!\r\n   * ========================================================================= */\r\n  useEffect(() => {\r\n    if (!mapContainerRef.current) return;\r\n\r\n    // Check if Mapbox token is provided\r\n    if (mapboxAccessToken) {\r\n      // Example integration:\r\n      /*\r\n      import mapboxgl from 'mapbox-gl';\r\n      import 'mapbox-gl/dist/mapbox-gl.css';\r\n\r\n      mapboxgl.accessToken = mapboxAccessToken;\r\n\r\n      const map = new mapboxgl.Map({\r\n        container: mapContainerRef.current,\r\n        style: 'mapbox://styles/mapbox/dark-v11', // Dark cartography style\r\n        projection: 'globe', // 3D Earth Globe projection in Mapbox v2+\r\n        center: [-119.5, 37.8], // California Sierra\r\n        zoom: ZOOM_TIERS[currentTier].mapboxZoom,\r\n        pitch: ZOOM_TIERS[currentTier].pitch,\r\n      });\r\n\r\n      map.on('style.load', () => {\r\n        // Set atmospheric star sky & space glow\r\n        map.setFog({\r\n          color: 'rgb(3, 5, 9)',\r\n          'high-color': 'rgb(14, 40, 80)',\r\n          'horizon-blend': 0.05,\r\n          'space-color': 'rgb(3, 5, 9)',\r\n          'star-intensity': 0.6,\r\n        });\r\n\r\n        // Add 3D Terrain & Fire GeoJSON Sources here\r\n      });\r\n\r\n      mapInstanceRef.current = map;\r\n\r\n      return () => map.remove();\r\n      */\r\n    }\r\n  }, [mapboxAccessToken]);\r\n\r\n  // Handle Zoom Tier Switch\r\n  const handleTierClick = (tierId) => {\r\n    setCurrentTier(tierId);\r\n    if (onTierChange) onTierChange(tierId);\r\n\r\n    // If Mapbox is active, smoothly animate camera to that tier's zoom & pitch\r\n    if (mapInstanceRef.current) {\r\n      const config = ZOOM_TIERS[tierId];\r\n      mapInstanceRef.current.flyTo({\r\n        zoom: config.mapboxZoom,\r\n        pitch: config.pitch,\r\n        duration: 2000,\r\n        essential: true,\r\n      });\r\n    }\r\n  };\r\n\r\n  const handleHotspotClick = (spot) => {\r\n    setSelectedHotspot(spot);\r\n    if (onSelectCluster) onSelectCluster(spot);\r\n  };\r\n\r\n  return (\r\n    <div className=\"globe-viewport\">\r\n      {/* 1. Mapbox Canvas Mount Node (When Mapbox is plugged in, it renders into this div) */}\r\n      <div ref={mapContainerRef} className=\"mapbox-canvas-container\" />\r\n\r\n      {/* 2. Atmospheric Space Backdrop */}\r\n      <div className=\"atmosphere-glow\" />\r\n\r\n      {/* 3. Developer Integration Guide Badge & Active AOI Indicator */}\r\n      <div style={{ position: 'absolute', top: '80px', left: '36px', zIndex: 25, display: 'flex', gap: '10px' }}>\r\n        <div className=\"mapbox-developer-badge\" style={{ position: 'static' }}>\r\n          <span style={{ color: '#38bdf8', fontWeight: 700 }}>Mapbox Plug-in Ready</span>\r\n          <span>• Mount ref linked</span>\r\n          {mapboxAccessToken ? (\r\n            <span style={{ color: '#4ade80' }}>✓ Token Connected</span>\r\n          ) : (\r\n            <span style={{ color: '#f59e0b' }}>ℹ Apple 3D View</span>\r\n          )}\r\n        </div>\r\n\r\n        {activeAOI && (\r\n          <div className=\"active-aoi-indicator\" style={{ position: 'static' }}>\r\n            <span className=\"active-aoi-badge-dot\" />\r\n            <span className=\"active-aoi-name\">AOI: {activeAOI.name}</span>\r\n            <span style={{ fontSize: '10px', color: '#94a3b8' }}>({activeAOI.areaKm2.toLocaleString()} km²)</span>\r\n            <button onClick={onClearAOI} className=\"active-aoi-clear-btn\" title=\"Clear boundary filter\">✕</button>\r\n          </div>\r\n        )}\r\n      </div>\r\n\r\n      {/* 4. Beautiful Native 3D Globe Fallback (Active until Mapbox token is plugged in) */}\r\n      {!mapboxAccessToken && (\r\n        <div className=\"globe-sphere\">\r\n          {/* Atmospheric Rim Lighting */}\r\n          <div className=\"globe-atmosphere-rim\" />\r\n\r\n          {/* Coordinate Grids (Lat/Lon) */}\r\n          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.2 }} viewBox=\"0 0 580 580\">\r\n            <circle cx=\"290\" cy=\"290\" r=\"230\" fill=\"none\" stroke=\"#ffffff\" strokeWidth=\"1\" strokeDasharray=\"3 3\" />\r\n            <ellipse cx=\"290\" cy=\"290\" rx=\"270\" ry=\"115\" fill=\"none\" stroke=\"#ffffff\" strokeWidth=\"1\" />\r\n            <ellipse cx=\"290\" cy=\"290\" rx=\"135\" ry=\"270\" fill=\"none\" stroke=\"#ffffff\" strokeWidth=\"1\" />\r\n          </svg>\r\n\r\n          {/* Continents Silhouettes */}\r\n          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.55 }} viewBox=\"0 0 580 580\">\r\n            <path d=\"M 175,145 Q 230,135 270,185 T 240,290 T 185,250 Z\" fill=\"#12243a\" stroke=\"#38bdf8\" strokeWidth=\"1\" strokeOpacity=\"0.4\" />\r\n            <path d=\"M 240,300 Q 290,340 270,430 T 220,390 Z\" fill=\"#12243a\" stroke=\"#38bdf8\" strokeWidth=\"1\" strokeOpacity=\"0.4\" />\r\n          </svg>\r\n\r\n          {/* Active AOI Boundary Polygon on Globe */}\r\n          {activeAOI && (\r\n            <div\r\n              style={{\r\n                position: 'absolute',\r\n                left: '170px',\r\n                top: '150px',\r\n                width: '120px',\r\n                height: '120px',\r\n                borderRadius: '50%',\r\n                border: '2px dashed #38bdf8',\r\n                backgroundColor: 'rgba(56, 189, 248, 0.08)',\r\n                boxShadow: '0 0 20px rgba(56, 189, 248, 0.35)',\r\n                pointerEvents: 'none',\r\n                zIndex: 4,\r\n              }}\r\n            />\r\n          )}\r\n\r\n          {/* ACTIVE FIRE HOTSPOTS */}\r\n          {SAMPLE_HOTSPOTS.map((spot) => {\r\n            // If spot is a ghost false-alarm and calibration is active, hide or show dashed\r\n            const isGhost = spot.isGhost;\r\n            if (isGhost && isCalibrated) {\r\n              // Show subtle dashed rings to demonstrate noise reduction\r\n            }\r\n\r\n            // Approximate screen placement on the globe\r\n            let left = 210;\r\n            let top = 190;\r\n            if (spot.id === 'fire-amazon-04') { left = 260; top = 350; }\r\n            if (spot.id === 'fire-aus-05') { left = 450; top = 400; }\r\n            if (spot.id === 'fire-ghost-02') { left = 190; top = 180; }\r\n            if (spot.id === 'fire-ghost-03') { left = 225; top = 205; }\r\n\r\n            return (\r\n              <div\r\n                key={spot.id}\r\n                onClick={() => handleHotspotClick(spot)}\r\n                style={{\r\n                  position: 'absolute',\r\n                  left: `${left}px`,\r\n                  top: `${top}px`,\r\n                  cursor: 'pointer',\r\n                  zIndex: isGhost ? 5 : 10,\r\n                }}\r\n              >\r\n                {/* Ghost Embers (Filtered Sensor Noise) */}\r\n                {isGhost && (\r\n                  <div\r\n                    className=\"ghost-ring\"\r\n                    style={{\r\n                      position: 'absolute',\r\n                      inset: '-12px',\r\n                      borderRadius: '50%',\r\n                      border: '1.5px dashed #f97316',\r\n                      opacity: isCalibrated ? 0.35 : 0.85,\r\n                      pointerEvents: 'none',\r\n                    }}\r\n                  />\r\n                )}\r\n\r\n                {/* Solid Glowing Fire Core */}\r\n                {!isGhost && (\r\n                  <div\r\n                    className=\"flame-ember\"\r\n                    style={{\r\n                      width: '20px',\r\n                      height: '20px',\r\n                      borderRadius: '50%',\r\n                      background: 'radial-gradient(circle, #ffffff 0%, #ffa500 45%, #ef4444 85%)',\r\n                      display: 'flex',\r\n                      alignItems: 'center',\r\n                      justifyContent: 'center',\r\n                    }}\r\n                  >\r\n                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ffffff' }} />\r\n                  </div>\r\n                )}\r\n\r\n                {/* Hotspot Label Tooltip */}\r\n                {!isGhost && selectedHotspot?.id === spot.id && (\r\n                  <div\r\n                    style={{\r\n                      position: 'absolute',\r\n                      left: '26px',\r\n                      top: '-6px',\r\n                      background: 'rgba(15, 23, 42, 0.92)',\r\n                      border: '1px solid rgba(255, 69, 0, 0.5)',\r\n                      borderRadius: '10px',\r\n                      padding: '6px 12px',\r\n                      fontSize: '11px',\r\n                      color: '#ffffff',\r\n                      whiteSpace: 'nowrap',\r\n                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.7)',\r\n                      zIndex: 30,\r\n                    }}\r\n                  >\r\n                    <div style={{ fontWeight: 700, color: '#ff4500' }}>\uD83D\uDD25 {spot.name}</div>\r\n                    <div style={{ fontSize: '10px', color: '#94a3b8' }}>\r\n                      {spot.region} • FRP: {spot.frp} MW\r\n                    </div>\r\n                  </div>\r\n                )}\r\n              </div>\r\n            );\r\n          })}\r\n        </div>\r\n      )}\r\n\r\n      {/* 5. 3-Tier Semantic Zoom Floating Switcher */}\r\n      <div className=\"hud-zoom-bar\">\r\n        {Object.values(ZOOM_TIERS).map((tier) => (\r\n          <button\r\n            key={tier.id}\r\n            onClick={() => handleTierClick(tier.id)}\r\n            className={`hud-pill-button ${currentTier === tier.id ? 'active' : ''}`}\r\n            title={tier.desc}\r\n          >\r\n            {tier.label}\r\n          </button>\r\n        ))}\r\n        <div className=\"hud-divider\" />\r\n        <span className=\"hud-hint-text\">\r\n          Drag globe to rotate • Click cluster to inspect\r\n        </span>\r\n      </div>\r\n    </div>\r\n  );\r\n}\r\n
+===================================================================
+diff --git a/frontend/src/components/GlobeViewer/GlobeViewer.jsx b/frontend/src/components/GlobeViewer/GlobeViewer.jsx
+--- a/frontend/src/components/GlobeViewer/GlobeViewer.jsx	(revision 694de8a1da0b3600670019cb27bc13aacd70593f)
++++ b/frontend/src/components/GlobeViewer/GlobeViewer.jsx	(date 1794689228459)
+@@ -1,6 +1,9 @@
+ import React, { useRef, useState, useEffect } from 'react';
+ import './GlobeViewer.css';
+ import { ZOOM_TIERS, SAMPLE_HOTSPOTS } from '../../data/mockHotspots';
++import mapboxgl from 'mapbox-gl';
++import 'mapbox-gl/dist/mapbox-gl.css';
++import './Map.css';
+ 
+ /**
+  * GlobeViewer Component
+@@ -41,54 +44,6 @@
+     }
+   }, [activeTier]);
+ 
+-  /* =========================================================================
+-   * 🚀 MAPBOX PLUG-IN HOOK (READY FOR YOUR TEAMMATE)
+-   * =========================================================================
+-   * When ready to connect Mapbox:
+-   * 1. Run: npm install mapbox-gl
+-   * 2. Pass your token via props or set here: mapboxgl.accessToken = 'pk.xxx'
+-   * 3. Uncomment the block below!
+-   * ========================================================================= */
+-  useEffect(() => {
+-    if (!mapContainerRef.current) return;
+-
+-    // Check if Mapbox token is provided
+-    if (mapboxAccessToken) {
+-      // Example integration:
+-      /*
+-      import mapboxgl from 'mapbox-gl';
+-      import 'mapbox-gl/dist/mapbox-gl.css';
+-
+-      mapboxgl.accessToken = mapboxAccessToken;
+-
+-      const map = new mapboxgl.Map({
+-        container: mapContainerRef.current,
+-        style: 'mapbox://styles/mapbox/dark-v11', // Dark cartography style
+-        projection: 'globe', // 3D Earth Globe projection in Mapbox v2+
+-        center: [-119.5, 37.8], // California Sierra
+-        zoom: ZOOM_TIERS[currentTier].mapboxZoom,
+-        pitch: ZOOM_TIERS[currentTier].pitch,
+-      });
+-
+-      map.on('style.load', () => {
+-        // Set atmospheric star sky & space glow
+-        map.setFog({
+-          color: 'rgb(3, 5, 9)',
+-          'high-color': 'rgb(14, 40, 80)',
+-          'horizon-blend': 0.05,
+-          'space-color': 'rgb(3, 5, 9)',
+-          'star-intensity': 0.6,
+-        });
+-
+-        // Add 3D Terrain & Fire GeoJSON Sources here
+-      });
+-
+-      mapInstanceRef.current = map;
+-
+-      return () => map.remove();
+-      */
+-    }
+-  }, [mapboxAccessToken]);
+ 
+   // Handle Zoom Tier Switch
+   const handleTierClick = (tierId) => {
