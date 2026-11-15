@@ -10,34 +10,99 @@ _LEGACY_DB = BASE_DIR / "data" / "data2.duckdb"
 DB_PATH = str(_NEW_DB if _NEW_DB.exists() else _LEGACY_DB)
 TABLE_NAME = "harmonized_hotspots"
 
+HOTSPOT_SOURCES = {
+    "harmonized": {
+        "table": TABLE_NAME,
+        "select": """
+            latitude AS lat,
+            longitude AS lon,
+            frp,
+            brightness,
+            confidence,
+            acq_date,
+            daynight,
+            pixel_count,
+            is_ghost,
+            sensor,
+            type,
+            NULL AS scan,
+            NULL AS track,
+            NULL AS satellite,
+            sensor AS instrument,
+            NULL AS bright_t31
+        """,
+        "calibrated_clause": " AND is_ghost = FALSE",
+    },
+    "modis": {
+        "table": "modis",
+        "select": """
+            latitude AS lat,
+            longitude AS lon,
+            frp,
+            brightness,
+            confidence::INTEGER AS confidence,
+            acq_date,
+            daynight,
+            1 AS pixel_count,
+            FALSE AS is_ghost,
+            'MODIS' AS sensor,
+            type,
+            scan,
+            track,
+            satellite,
+            instrument,
+            bright_t31
+        """,
+        "calibrated_clause": " AND type = 0",
+    },
+    "viirs": {
+        "table": "viirs",
+        "select": """
+            latitude AS lat,
+            longitude AS lon,
+            frp,
+            bright_ti4 AS brightness,
+            CASE confidence
+                WHEN 'h' THEN 95
+                WHEN 'n' THEN 75
+                ELSE 30
+            END::INTEGER AS confidence,
+            acq_date,
+            daynight,
+            1 AS pixel_count,
+            FALSE AS is_ghost,
+            'VIIRS' AS sensor,
+            type,
+            scan,
+            track,
+            satellite,
+            instrument,
+            bright_ti5 AS bright_t31
+        """,
+        "calibrated_clause": " AND type = 0",
+    },
+}
+
 
 def get_db_connection():
-    return duckdb.connect(database=DB_PATH, read_only=True)
+    connection = duckdb.connect(database=str(DB_PATH), read_only=True)
+    connection.execute("LOAD spatial")
+    return connection
 
 
 def build_aoi_filter(aoi_lat=None, aoi_lon=None, aoi_radius=None):
-    """Build a parameterized Haversine distance SQL clause (in km) for an AOI."""
+    """Build a DuckDB Spatial ST_DWithin AOI filter using the RTREE-indexed location column."""
     if all(v is not None for v in (aoi_lat, aoi_lon, aoi_radius)):
-        clause = """
-            AND (6371 * acos(
-                LEAST(1.0, GREATEST(-1.0,
-                    cos(radians(?)) * cos(radians(latitude)) *
-                    cos(radians(longitude) - radians(?)) +
-                    sin(radians(?)) * sin(radians(latitude))
-                ))
-            )) <= ?
-        """
-        params = [
-            float(aoi_lat),
-            float(aoi_lon),
-            float(aoi_lat),
-            float(aoi_radius),
-        ]
+        deg_radius = float(aoi_radius) / 111.32
+        clause = " AND st_dwithin(location, st_point(?, ?), ?)"
+        params = [float(aoi_lat), float(aoi_lon), deg_radius]
         return clause, params
     return "", []
 
 
-def get_hotspots(
+def _query_hotspots_for_source(
+    cursor,
+    source_key,
     year=None,
     is_calibrated=True,
     aoi_lat=None,
@@ -46,70 +111,112 @@ def get_hotspots(
     min_frp=None,
     limit=1000,
 ):
-    """Query harmonized hotspot points from DuckDB with optional filters."""
+    """Execute a hotspot point query for one validated source key on an open cursor."""
+    if source_key not in HOTSPOT_SOURCES:
+        valid = ", ".join(HOTSPOT_SOURCES)
+        raise ValueError(f"Unsupported hotspot source '{source_key}'. Expected one of: {valid}")
+
+    cfg = HOTSPOT_SOURCES[source_key]
+    query = f"""
+        SELECT
+            {cfg["select"]}
+        FROM {cfg["table"]}
+        WHERE 1=1
+    """
+    params = []
+
+    if year is not None:
+        query += " AND EXTRACT(year FROM acq_date) = ?"
+        params.append(int(year))
+
+    if is_calibrated:
+        query += cfg["calibrated_clause"]
+
+    if min_frp is not None:
+        query += " AND frp >= ?"
+        params.append(float(min_frp))
+
+    aoi_clause, aoi_params = build_aoi_filter(aoi_lat, aoi_lon, aoi_radius)
+    query += aoi_clause
+    params.extend(aoi_params)
+
+    query += " ORDER BY frp DESC"
+    if limit is not None:
+        query += " LIMIT ?"
+        params.append(int(limit))
+
+    cursor.execute(query, params)
+
+    columns = [desc[0] for desc in cursor.description]
+    rows = cursor.fetchall()
+
+    results = []
+    for row in rows:
+        record = dict(zip(columns, row))
+        if isinstance(record.get("acq_date"), date):
+            record["acq_date"] = record["acq_date"].isoformat()
+        results.append(record)
+
+    return results
+
+
+def get_hotspots(
+    year=None,
+    source="harmonized",
+    is_calibrated=True,
+    aoi_lat=None,
+    aoi_lon=None,
+    aoi_radius=None,
+    min_frp=None,
+    limit=1000,
+):
+    """Query hotspot points from one table: harmonized_hotspots, modis, or viirs."""
+    source_key = (source or "harmonized").lower()
     connection = get_db_connection()
     try:
         cursor = connection.cursor()
+        return _query_hotspots_for_source(
+            cursor,
+            source_key,
+            year=year,
+            is_calibrated=is_calibrated,
+            aoi_lat=aoi_lat,
+            aoi_lon=aoi_lon,
+            aoi_radius=aoi_radius,
+            min_frp=min_frp,
+            limit=limit,
+        )
+    finally:
+        connection.close()
 
-        query = f"""
-            SELECT 
-                latitude AS lat,
-                longitude AS lon,
-                frp,
-                brightness,
-                confidence,
-                acq_date,
-                daynight,
-                pixel_count,
-                is_ghost,
-                sensor,
-                type,
-                confidence,
-                scan,
-                track,
-                type,
-                satellite, 
-                instrument,
-                bright_t31
-            FROM {TABLE_NAME}
-            WHERE 1=1
-        """
-        params = []
 
-        if year is not None:
-            query += " AND EXTRACT(year FROM acq_date) = ?"
-            params.append(int(year))
-
-        if is_calibrated:
-            query += " AND is_ghost = FALSE"
-
-        if min_frp is not None:
-            query += " AND frp >= ?"
-            params.append(float(min_frp))
-
-        aoi_clause, aoi_params = build_aoi_filter(aoi_lat, aoi_lon, aoi_radius)
-        query += aoi_clause
-        params.extend(aoi_params)
-
-        query += " ORDER BY frp DESC"
-        if limit is not None:
-            query += " LIMIT ?"
-            params.append(int(limit))
-
-        cursor.execute(query, params)
-
-        columns = [desc[0] for desc in cursor.description]
-        rows = cursor.fetchall()
-
-        results = []
-        for row in rows:
-            record = dict(zip(columns, row))
-            if isinstance(record.get("acq_date"), date):
-                record["acq_date"] = record["acq_date"].isoformat()
-            results.append(record)
-
-        return results
-
+def get_all_hotspots(
+    year=None,
+    is_calibrated=True,
+    aoi_lat=None,
+    aoi_lon=None,
+    aoi_radius=None,
+    min_frp=None,
+    limit=1000,
+):
+    """Query hotspot points from all three tables (harmonized, modis, viirs) at once."""
+    connection = get_db_connection()
+    try:
+        cursor = connection.cursor()
+        return {
+            source_key: _query_hotspots_for_source(
+                cursor,
+                source_key,
+                year=year,
+                is_calibrated=is_calibrated,
+                aoi_lat=aoi_lat,
+                aoi_lon=aoi_lon,
+                aoi_radius=aoi_radius,
+                min_frp=min_frp,
+                limit=limit,
+            )
+            for source_key in HOTSPOT_SOURCES
+        }
     finally:
         connection.close()
 
