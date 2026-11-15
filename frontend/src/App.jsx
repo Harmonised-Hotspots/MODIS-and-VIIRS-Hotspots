@@ -7,6 +7,7 @@ import AOIPanel from './components/AOIPanel/AOIPanel';
 import MethodologyDrawer from './components/MethodologyDrawer/MethodologyDrawer';
 import './App.css';
 
+
 function App() {
   const [isCalibrated, setIsCalibrated] = useState(true);
   const [activeTier, setActiveTier] = useState(1);
@@ -121,4 +122,6 @@ function App() {
   );
 }
 
-export default App;
+export default function () {
+  return <App />;
+}
