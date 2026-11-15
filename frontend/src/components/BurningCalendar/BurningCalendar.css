@@ -9,6 +9,16 @@
 	justify-content: center;
 }
 
+.year-select {
+  font-family: inherit;
+  background: #202334;
+  color: white;
+  border: 1px solid grey;
+  border-radius: 3px;
+  font-size: 14px;
+  padding: 2px;
+}
+
 .calendar-dock {
   left: 24px;
   right: 24px;

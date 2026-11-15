@@ -42,7 +42,7 @@ export default function BurningCalendar({
         <div className="calendar-title-group">
           <span className="calendar-main-title">Daily Burning Activity</span>
 
-          <select onChange={e => onSelectYear(e.target.value)} value={selectedYear}>
+          <select className="year-select" onChange={e => onSelectYear(e.target.value)} value={selectedYear}>
             {YEARS.map(year => <option key={year}>{year}</option>)}
           </select>
         </div>
