@@ -111,7 +111,6 @@ const createDot = (color) => {
 export default function HotspotMap({ activeAOI = null, onClearAOI }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
-  const [hotspots] = useState(SAMPLE_HOTSPOTS);
   const [mapReady, setMapReady] = useState(false);
   // Just added when changing markers to dots
   const [selectedYear, setSelectedYear] = useState(2024); // or take as a prop
@@ -128,7 +127,8 @@ export default function HotspotMap({ activeAOI = null, onClearAOI }) {
       center: [-106, 56],
       zoom: 3,
     });
-    mapRef.current = map;
+
+    const map = mapRef.current;
 
     map.on('load', () => {
       map.addSource(AOI_SOURCE_ID, {
