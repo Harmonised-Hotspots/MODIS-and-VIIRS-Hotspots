@@ -7,19 +7,48 @@ import './SummaryCard.css';
  */
 export default function SummaryCard({
   activeYear = 2020,
+  activeAOI = null,
 }) {
   const [data, setData] = useState({});
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
-      const endpoint = `http://127.0.0.1:5000/api/summary?year=${activeYear}`;
-      const data = await fetch(endpoint).then(r => r.json());
-      setData(data);
+      const params = new URLSearchParams({
+        year: activeYear,
+      });
+
+      if (activeAOI) {
+        params.append('aoi_lat', activeAOI.lat);
+        params.append('aoi_lon', activeAOI.lon);
+        params.append('aoi_radius', activeAOI.radiusKm || 100);
+      }
+
+      const endpoint = `http://127.0.0.1:5000/api/summary?${params.toString()}`;
+      try {
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error(`Summary fetch failed with status ${response.status}`);
+        }
+        const json = await response.json();
+        if (!cancelled) {
+          setData(json);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Summary fetch failed:', err);
+          setData({});
+        }
+      }
     })();
-  }, [activeYear]);
 
+    return () => {
+      cancelled = true;
+    };
+  }, [activeYear, activeAOI]);
 
-  // Calibrated counts vs uncalibrated raw VIIRS noise
+  // Calibrated counts vs uncalibrated raw VIIRS noise (for active AOI or all Canada)
   const calibratedCount = data?.calibrated_count;
   const rawCount = data?.raw_count;
   const ghostEmbersCount = data?.ghost_embers_filtered;
@@ -33,14 +62,18 @@ export default function SummaryCard({
       
       {/* 1. Active Year Header */}
       <div>
-        <div className="summary-main-title">Year {activeYear} Summary</div>
+        <div className="summary-main-title">
+          {activeAOI
+            ? `Year ${activeYear} Summary — ${activeAOI.name}`
+            : `Year ${activeYear} Summary`}
+        </div>
       </div>
 
       {/* 2. Hero Calibrated vs Raw Metric */}
       <div className="summary-hero-metric">
         <div className={`summary-hero-number`}>
           Harmonized: {calibratedCount?.toLocaleString()}<br/>
-          Raw: {rawCount ? Math.round(rawCount)?.toLocaleString() : ''}<br/>
+          Raw: {rawCount != null ? Math.round(rawCount).toLocaleString() : ''}<br/>
           <span style={{fontSize: '20px'}}>Baseline: {normalBaseline?.toLocaleString()}</span>
         </div>
       </div>
@@ -49,7 +82,11 @@ export default function SummaryCard({
       <div className="summary-anomaly-banner">
         <div className="anomaly-title">
           <Flame className="w-4 h-4 text-amber-500" />
-          <span>▲ {anomalyPercent}% compared to historical data</span>
+          <span>
+            {anomalyPercent != null
+              ? `${anomalyPercent >= 0 ? '▲' : '▼'} ${anomalyPercent}% compared to historical data`
+              : 'Loading historical comparison...'}
+          </span>
         </div>
       </div>
 
@@ -70,7 +107,7 @@ export default function SummaryCard({
           </span>
           <span className="summary-metric-value danger">
             {worstDay?.label}<br/>
-            FRP: {worstDay?.frp_mw.toLocaleString()} MW
+            FRP: {worstDay?.frp_mw?.toLocaleString()} MW
           </span>
         </div>
 
