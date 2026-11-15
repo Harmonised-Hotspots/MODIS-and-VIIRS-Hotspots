@@ -90,6 +90,7 @@
 }
 
 .calendar-day-name {
+  color: white;
   font-size: 12px;
   line-height: 12px;
   height: 12px;
@@ -99,6 +100,7 @@
 }
 
 .calendar-month-name {
+  color: white;
   position: absolute;
   top: 0;
   font-size: 12px;
