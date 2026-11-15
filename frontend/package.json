@@ -10,11 +10,15 @@
   },
   "dependencies": {
     "lucide-react": "^1.73.0",
+    "mapbox-gl": "^3.35.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.3",
     "vite": "^5.4.10"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
   }
 }
