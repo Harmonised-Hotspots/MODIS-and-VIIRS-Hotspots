@@ -22,24 +22,35 @@ function App() {
   const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
 
   // One-click CSV export generator (Feature 6 requirement)
-  const handleExportCSV = () => {
+  const handleExportCSV = async () => {
     const aoiLabel = activeAOI ? activeAOI.name.replace(/[^a-zA-Z0-9]/g, '_') : activeRegion;
-    const csvContent = [
-      'date,latitude,longitude,frp_megawatts,sensor,aoi_filter,harmonized_confidence',
-      `2020-08-22,37.195,-119.261,1840.4,MODIS_VIIRS_SYNTH,${aoiLabel},98.2`,
-      `2020-08-22,37.210,-119.280,1210.8,VIIRS_CROSS_CAL,${aoiLabel},95.6`,
-      `2020-08-22,37.180,-119.240,890.1,MODIS_C61,${aoiLabel},92.0`,
-      `2020-08-23,37.250,-119.310,1450.0,MODIS_VIIRS_SYNTH,${aoiLabel},97.1`,
-    ].join('\n');
+    const params = new URLSearchParams({
+      year: selectedYear,
+      calibrated: isCalibrated,
+      aoi_name: aoiLabel,
+    });
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `nasa_fire_harmonized_${aoiLabel}_${selectedYear}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (activeAOI) {
+      params.append('aoi_lat', activeAOI.lat);
+      params.append('aoi_lon', activeAOI.lon);
+      params.append('aoi_radius', activeAOI.radiusKm || 100);
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/export?${params.toString()}`);
+      if (!response.ok) throw new Error(`Export failed with status ${response.status}`);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `nasa_fire_harmonized_${aoiLabel}_${selectedYear}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('CSV export failed:', err);
+    }
   };
 
   return (
@@ -105,9 +116,10 @@ function App() {
         activeRegion={activeAOI ? activeAOI.name : 'California Sierra'}
         onExportCSV={handleExportCSV}
       />
-
     </div>
   );
 }
 
-export default App;
+export default function () {
+  return <App />;
+}
