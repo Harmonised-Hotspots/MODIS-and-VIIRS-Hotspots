@@ -34,9 +34,13 @@ def get_hotspots(
                 brightness,
                 acq_date,
                 daynight,
+                confidence,
                 scan,
                 track,
-                type
+                type,
+                satellite, 
+                instrument,
+                bright_t31
             FROM {TABLE_NAME}
             WHERE 1=1
         """
