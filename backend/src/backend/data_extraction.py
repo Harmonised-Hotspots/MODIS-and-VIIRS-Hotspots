@@ -36,6 +36,7 @@ def get_hotspots(
                 daynight,
                 scan,
                 track,
+                confidence,
                 type
             FROM {TABLE_NAME}
             WHERE 1=1
