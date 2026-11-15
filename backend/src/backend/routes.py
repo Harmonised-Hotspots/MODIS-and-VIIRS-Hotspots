@@ -1,7 +1,9 @@
 from flask import Blueprint, jsonify, request, Response
 from backend.analytics import get_historical_comparison, get_summary
 from backend.data_extraction import (
+    HOTSPOT_SOURCES,
     export_hotspots_csv,
+    get_all_hotspots,
     get_calendar_matrix,
     get_hotspots,
 )
@@ -27,15 +29,49 @@ def index():
 @api_bp.route("/api/hotspots", methods=["GET"])
 def hotspots_endpoint():
     year = request.args.get("year", default=2024, type=int)
+    source = request.args.get("source", default="all").lower()
+    if source != "all" and source not in HOTSPOT_SOURCES:
+        return jsonify({
+            "error": f"Invalid source '{source}'. Must be one of: all, {', '.join(HOTSPOT_SOURCES)}",
+        }), 400
+
     is_calibrated = request.args.get("calibrated", default="true").lower() == "true"
     aoi_lat = request.args.get("aoi_lat", type=float)
     aoi_lon = request.args.get("aoi_lon", type=float)
     aoi_radius = request.args.get("aoi_radius", type=float)
     min_frp = request.args.get("min_frp", type=float)
-    limit = request.args.get("limit", default=1000, type=int)
+
+    raw_limit = request.args.get("limit", default="1000")
+    if str(raw_limit).lower() in ("all", "none"):
+        limit = None
+    else:
+        try:
+            parsed_limit = int(raw_limit)
+        except ValueError:
+            return jsonify({"error": f"Invalid limit '{raw_limit}'. Provide a positive integer or 'all'."}), 400
+        limit = None if parsed_limit <= 0 else parsed_limit
+
+    if source == "all":
+        layers = get_all_hotspots(
+            year=year,
+            is_calibrated=is_calibrated,
+            aoi_lat=aoi_lat,
+            aoi_lon=aoi_lon,
+            aoi_radius=aoi_radius,
+            min_frp=min_frp,
+            limit=limit,
+        )
+        counts = {k: len(v) for k, v in layers.items()}
+        return jsonify({
+            "source": "all",
+            "counts": counts,
+            "total_count": sum(counts.values()),
+            "data": layers,
+        })
 
     data = get_hotspots(
         year=year,
+        source=source,
         is_calibrated=is_calibrated,
         aoi_lat=aoi_lat,
         aoi_lon=aoi_lon,
@@ -43,7 +79,7 @@ def hotspots_endpoint():
         min_frp=min_frp,
         limit=limit,
     )
-    return jsonify({"count": len(data), "data": data})
+    return jsonify({"source": source, "count": len(data), "data": data})
 
 
 @api_bp.route("/api/calendar", methods=["GET"])

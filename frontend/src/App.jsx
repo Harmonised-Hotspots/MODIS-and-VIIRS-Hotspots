@@ -44,8 +44,13 @@ function App() {
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-[#030509]">
       
-      {/* 1. Top Navigation Bar with AOI Draw & Harmonization Switch */}
-      <TopNav onExportCSV={handleExportCSV} />
+      {/* 1. Top Navigation Bar with Mapbox Area Search & Export */}
+      <TopNav
+        onExportCSV={handleExportCSV}
+        activeAOI={activeAOI}
+        onSelectAOI={setActiveAOI}
+        onClearAOI={() => setActiveAOI(null)}
+      />
 
       {/* 2. 3D Earth Globe & Hotspot Visualizer (Feature 1) */}
       <GlobeViewer

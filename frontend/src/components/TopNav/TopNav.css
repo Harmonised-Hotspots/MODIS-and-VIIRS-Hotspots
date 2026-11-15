@@ -87,6 +87,12 @@
   gap: 10px;
 }
 
+.nav-mapbox-search-wrap {
+  width: 310px;
+  position: relative;
+  z-index: 60;
+}
+
 .nav-search-box {
   position: relative;
   display: flex;
