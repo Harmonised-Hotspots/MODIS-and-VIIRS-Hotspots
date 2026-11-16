@@ -81,16 +81,16 @@ function buildAreaHighlightGeoJSON(aoi) {
 // Modis, Viirs, and harmonized data all have different color shades
 // Darker shades will display firespots with high and low probability confidence
 const COLORS = {
-  MODIS: {high: '#b30000', low: '#fc8d59'},
-  VIIRS: {high: '#08519c', low: '#6baed6'},
-  HARMONIZED: {high: '#54278f', low: '#9e9ac8'}
+  modis: {high: '#b30000', low: '#fc8d59'},
+  viirs: {high: '#08519c', low: '#6baed6'},
+  harmonized: {high: '#54278f', low: '#9e9ac8'}
 };
 // Fallback color means code is not properly intaking the h value (deosnt know whether dot is modis, viirs, or harmonized
 const ERR_COLOR = '#FFFFFF';
 
 // Color logic
-const COLOR_EXPRESSION = (h) => {
-   const palette = COLORS[h.source ?? 'MODIS'];
+const COLOR_EXPRESSION = (s, h) => {
+   const palette = COLORS[s];
    if (!palette) return ERR_COLOR;
    // if confidence is over 75 categorize as high if under categorize as low
     return h.confidence < 75 ? palette.low : palette.high;
@@ -195,7 +195,7 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
       // Place markers from fetched data
       hotspots = ['harmonized', 'modis', 'viirs'].flatMap(s => HOTSPOT_RECORD[s].map((h) =>
           // Change markers to dot
-        new mapboxgl.Marker({ element: createDot(COLOR_EXPRESSION(h))})
+        new mapboxgl.Marker({ element: createDot(COLOR_EXPRESSION(s, h))})
           .setLngLat([h.lon, h.lat])
           .setPopup(new mapboxgl.Popup().setText(`FRP: ${h.frp} MW`))
           .addTo(mapRef.current)
