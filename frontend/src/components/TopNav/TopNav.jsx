@@ -67,7 +67,7 @@ export default function TopNav({
       <div className="nav-brand-group">
         <div className="nav-title-group">
           <div className="nav-main-title">
-            Harmonized Canadian Fire Observatory
+            Fire Observatory
           </div>
         </div>
       </div>

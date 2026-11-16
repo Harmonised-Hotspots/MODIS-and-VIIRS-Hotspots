@@ -251,6 +251,7 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
   }, [mapReady, activeAOI]);
 
   return (
+    <>
     <div className="globe-wrapper">
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
       {activeAOI && (
@@ -264,5 +265,24 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
         </div>
       )}
     </div>
+    <div className="legend">
+    <strong>Map Legend</strong>
+    <div className="legend-item">
+      <span className="swatch" style={{background: COLORS.modis.high}}></span>
+      <span className="swatch" style={{background: COLORS.modis.low}}></span>
+      MODIS high/low
+    </div>
+    <div className="legend-item">
+      <span className="swatch" style={{background: COLORS.viirs.high}}></span>
+      <span className="swatch" style={{background: COLORS.viirs.low}}></span>
+      VIIRS high/low
+    </div>
+    <div className="legend-item">
+      <span className="swatch" style={{background: COLORS.harmonized.high}}></span>
+      <span className="swatch" style={{background: COLORS.harmonized.low}}></span>
+      Harmonized high/low
+    </div>
+    </div>
+    </>
   );
 }
