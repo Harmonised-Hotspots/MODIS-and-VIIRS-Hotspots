@@ -144,11 +144,11 @@
 }
 
 /* Color Levels */
-.level-0 { background-color: #0e1626; }
-.level-1 { background-color: #075985; }
-.level-2 { background-color: #0284c7; }
-.level-3 { background-color: #d59e0b; }
-.level-4 { background-color: #bf4444; }
+.level-0 { background-color: #00000000; }
+.level-1 { background-color: #ffe6cc; }
+.level-2 { background-color: #ffb366; }
+.level-3 { background-color: #ff8000; }
+.level-4 { background-color: #EC030F; }
 
 .peak-day {
   position: relative;
