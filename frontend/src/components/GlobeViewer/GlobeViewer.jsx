@@ -203,7 +203,7 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
     })();
 
     return () => hotspots.forEach((m) => m.remove());
-  }, [mapReady, selectedYear]);
+  }, [mapReady, selectedYear, activeAOI]);
 
   // Highlight searched area without dropping a pin
   useEffect(() => {
