@@ -6,6 +6,7 @@ import {
   Tooltip,
   CartesianGrid,
   Line,
+  ResponsiveContainer,
 } from "recharts";
 import "./AnalyticsCard.css";
 import { LONG_MONTH_NAMES, MONTH_NAMES } from "../../data/calendarData";
@@ -30,18 +31,20 @@ export default function AnalyticsCard({ selectedYear, selectedMonth }) {
         <div style={{ fontSize: "16px", fontWeight: "bold", marginBottom: 10 }}>
           Yearly Trends
         </div>
-        <LineChart data={data.yearly_trend} width={350} height={120}>
-          <XAxis dataKey="year" fontSize="12" />
-          <YAxis fontSize="12" />
-          {yearlyMetric === "counts" ? (
-            <>
-              <Line type="monotone" dataKey="calibrated_count" />
-              <Line type="monotone" dataKey="raw_count" />
-            </>
-          ) : (
-            <Line type="monotone" dataKey="total_frp" />
-          )}
-        </LineChart>
+        <ResponsiveContainer width="100%" height={120}>
+          <LineChart data={data.yearly_trend}>
+            <XAxis dataKey="year" fontSize="12" />
+            <YAxis fontSize="12" />
+            {yearlyMetric === "counts" ? (
+              <>
+                <Line type="monotone" dataKey="calibrated_count" />
+                <Line type="monotone" dataKey="raw_count" />
+              </>
+            ) : (
+              <Line type="monotone" dataKey="total_frp" />
+            )}
+          </LineChart>
+        </ResponsiveContainer>
         <div className="chart-selector">
           <select onChange={(e) => setYearlyMetric(e.target.value)}>
             <option value="counts">Harmonized and Raw counts</option>
@@ -53,42 +56,44 @@ export default function AnalyticsCard({ selectedYear, selectedMonth }) {
         <div style={{ fontSize: "16px", fontWeight: "bold", marginBottom: 10 }}>
           Monthly Trends
         </div>
-        <LineChart data={data.monthly_comparison} width={350} height={120}>
-          <XAxis
-            dataKey="month"
-            fontSize="12"
-            tick={(d) => {
-              return (
-                <g transform={`translate(${d.x},${d.y})`}>
-                  <text
-                    x={0}
-                    y={0}
-                    dy={16}
-                    textAnchor="end"
-                    transform="rotate(-35)"
-                    fill="#777"
-                    fontSize="12px"
-                  >
-                    {MONTH_NAMES[d.payload.value - 1]}
-                  </text>
-                </g>
-              );
-            }}
-          />
-          <YAxis fontSize="12" />
-          {[
-            "current_count",
-            "current_frp",
-            "frp_pct_vs_median",
-            "historical_median_count",
-            "historical_median_frp",
-            "pct_vs_median",
-          ]
-            .filter((f) => f === monthlyMetric)
-            .map((f) => (
-              <Line type="monotone" dataKey={f} />
-            ))}
-        </LineChart>
+        <ResponsiveContainer width="100%" height={120}>
+          <LineChart data={data.monthly_comparison}>
+            <XAxis
+              dataKey="month"
+              fontSize="12"
+              tick={(d) => {
+                return (
+                  <g transform={`translate(${d.x},${d.y})`}>
+                    <text
+                      x={0}
+                      y={0}
+                      dy={16}
+                      textAnchor="end"
+                      transform="rotate(-35)"
+                      fill="#777"
+                      fontSize="12px"
+                    >
+                      {MONTH_NAMES[d.payload.value - 1]}
+                    </text>
+                  </g>
+                );
+              }}
+            />
+            <YAxis fontSize="12" />
+            {[
+              "current_count",
+              "current_frp",
+              "frp_pct_vs_median",
+              "historical_median_count",
+              "historical_median_frp",
+              "pct_vs_median",
+            ]
+              .filter((f) => f === monthlyMetric)
+              .map((f) => (
+                <Line key={f} type="monotone" dataKey={f} />
+              ))}
+          </LineChart>
+        </ResponsiveContainer>
         <div className="chart-selector">
           <select onChange={(e) => setMonthlyMetric(e.target.value)}>
             <option value="current_count">Counts</option>

@@ -1,8 +1,11 @@
 .analytics-card {
   position: absolute;
-  top: 80px;
-  left: 28px;
-  width: 380px;
+  top: 78px;
+  left: clamp(12px, 2vw, 28px);
+  width: clamp(270px, 26vw, 360px);
+  max-height: calc(100vh - 332px);
+  overflow-y: auto;
+  box-sizing: border-box;
   background: rgba(11, 17, 32, 0.82);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -15,6 +18,15 @@
   z-index: 35;
   user-select: none;
 	color: white;
+}
+
+@media (max-width: 1023px), (max-height: 639px) {
+  .analytics-card {
+    position: static;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 .chart-selector {
