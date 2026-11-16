@@ -44,7 +44,7 @@ export default function AnalyticsCard({ selectedYear, selectedMonth }) {
         </LineChart>
         <div className="chart-selector">
           <select onChange={(e) => setYearlyMetric(e.target.value)}>
-            <option>Harmonized and Raw counts</option>
+            <option value="counts">Harmonized and Raw counts</option>
             <option>FRP</option>
           </select>
         </div>
