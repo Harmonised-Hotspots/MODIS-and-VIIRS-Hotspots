@@ -187,7 +187,7 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
         params.append('aoi_radius', activeAOI.radiusKm || 100);
       }
 
-      const endpoint = `http://localhost:5000/api/hotspots?${params.toString()}`;
+      const endpoint = `http://127.0.0.1:5000/api/hotspots?${params.toString()}`;
       const json = await fetch(endpoint).then(r => r.json());
 
       const HOTSPOT_RECORD = json.data?? [];
