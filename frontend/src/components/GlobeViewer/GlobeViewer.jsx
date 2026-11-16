@@ -162,7 +162,16 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
     // set map to ready once loaded
     mapRef.current.on('load', () => setMapReady(true));
 
+    const observer =
+      typeof ResizeObserver !== 'undefined' && containerRef.current
+        ? new ResizeObserver(() => map.resize())
+        : null;
+    if (observer && containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
     return () => {
+      observer?.disconnect();
       map.remove();
       mapRef.current = null;
       setMapReady(false);
@@ -242,43 +251,13 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
   }, [mapReady, activeAOI]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
+    <div className="globe-wrapper">
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
       {activeAOI && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 78,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 25,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '6px 14px',
-            borderRadius: 9999,
-            background: 'rgba(15, 23, 42, 0.85)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#f8fafc',
-            fontSize: 12,
-            fontWeight: 600,
-            backdropFilter: 'blur(12px)',
-          }}
-        >
+        <div className="aoi-pill-banner">
           <span>Area highlighted: {activeAOI.name}</span>
           {onClearAOI && (
-            <button
-              onClick={onClearAOI}
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: 'none',
-                color: '#f8fafc',
-                borderRadius: 9999,
-                padding: '2px 8px',
-                cursor: 'pointer',
-                fontSize: 11,
-              }}
-            >
+            <button onClick={onClearAOI} className="aoi-pill-clear-btn">
               Clear
             </button>
           )}

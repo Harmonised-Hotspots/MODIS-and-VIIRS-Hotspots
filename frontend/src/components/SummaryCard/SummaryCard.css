@@ -2,9 +2,12 @@
 
 .summary-card {
   position: absolute;
-  top: 80px;
-  right: 28px;
-  width: 326px;
+  top: 78px;
+  right: clamp(12px, 2vw, 28px);
+  width: clamp(260px, 24vw, 326px);
+  max-height: calc(100vh - 332px);
+  overflow-y: auto;
+  box-sizing: border-box;
   background: rgba(11, 17, 32, 0.82);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -17,6 +20,15 @@
   z-index: 35;
   user-select: none;
   color: white;
+}
+
+@media (max-width: 1023px), (max-height: 639px) {
+  .summary-card {
+    position: static;
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 .summary-header-label {
