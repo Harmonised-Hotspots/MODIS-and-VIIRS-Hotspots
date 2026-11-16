@@ -122,7 +122,7 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
     // if no map is in effect create a new map
     mapRef.current = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/keromei/cmwgso8ny00bv01sg5e7ydhpb',
+      style: 'mapbox://styles/brianpeiris/cmwimriru00bg01st10f0b2m6',
       center: [-106, 56],
       zoom: 3,
     });
@@ -177,20 +177,30 @@ export default function HotspotMap({ activeAOI = null, onClearAOI, selectedYear 
 
     // fetch data from api
     (async () => {
-      const endpoint = `http://localhost:5000/api/hotspots?year=${selectedYear}`;
+      const params = new URLSearchParams({
+        year: selectedYear,
+      });
+
+      if (activeAOI) {
+        params.append('aoi_lat', activeAOI.lat);
+        params.append('aoi_lon', activeAOI.lon);
+        params.append('aoi_radius', activeAOI.radiusKm || 100);
+      }
+
+      const endpoint = `http://localhost:5000/api/hotspots?${params.toString()}`;
       const json = await fetch(endpoint).then(r => r.json());
 
       const HOTSPOT_RECORD = json.data?? [];
 
       // Place markers from fetched data
-      hotspots = HOTSPOT_RECORD.map((h) =>
+      hotspots = ['harmonized', 'modis', 'viirs'].flatMap(s => HOTSPOT_RECORD[s].map((h) =>
           // Change markers to dot
         new mapboxgl.Marker({ element: createDot(COLOR_EXPRESSION(h))})
           .setLngLat([h.lon, h.lat])
           .setPopup(new mapboxgl.Popup().setText(`FRP: ${h.frp} MW`))
           .addTo(mapRef.current)
-      );
-    }) ();
+      ));
+    })();
 
     return () => hotspots.forEach((m) => m.remove());
   }, [mapReady, selectedYear]);
