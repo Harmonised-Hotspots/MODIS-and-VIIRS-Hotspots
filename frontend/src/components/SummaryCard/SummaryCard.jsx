@@ -81,10 +81,22 @@ export default function SummaryCard({
 
       {/* 2. Hero Calibrated vs Raw Metric */}
       <div className="summary-hero-metric">
-        <div className={`summary-hero-number`}>
-          Harmonized: {calibratedCount?.toLocaleString()}<br/>
-          Raw: {rawCount != null ? Math.round(rawCount).toLocaleString() : ''}<br/>
-          <span style={{fontSize: '20px'}}>Baseline: {normalBaseline?.toLocaleString()}</span>
+        <div className="summary-hero-number">
+          Harmonized: {calibratedCount?.toLocaleString()}
+        </div>
+        <div className="summary-hero-substats">
+          <div className="summary-hero-subrow">
+            <span>Raw Detections</span>
+            <span className="summary-hero-subvalue">
+              {rawCount != null ? Math.round(rawCount).toLocaleString() : '—'}
+            </span>
+          </div>
+          <div className="summary-hero-subrow">
+            <span>Historical Baseline</span>
+            <span className="summary-hero-subvalue">
+              {normalBaseline != null ? normalBaseline.toLocaleString() : '—'}
+            </span>
+          </div>
         </div>
       </div>
 
