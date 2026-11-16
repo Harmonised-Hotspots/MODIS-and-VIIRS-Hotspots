@@ -195,3 +195,23 @@
   align-items: center;
   gap: 10px;
 }
+
+.legend {
+  position: absolute;
+  bottom: 40px;
+  right: 20px;
+  color: white;
+  background: rgba(11, 17, 32, 0.82);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.legend .swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 10px;
+}
