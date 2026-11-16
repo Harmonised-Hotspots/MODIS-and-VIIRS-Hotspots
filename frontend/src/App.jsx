@@ -44,7 +44,7 @@ function App() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#030509]">
+    <div className="app-shell">
       
       {/* 1. Top Navigation Bar with Mapbox Area Search & Export */}
       <TopNav
@@ -54,32 +54,37 @@ function App() {
         onClearAOI={() => setActiveAOI(null)}
       />
 
-      {/* 2. 3D Earth Globe & Hotspot Visualizer (Feature 1) */}
-      <GlobeViewer
-        mapboxAccessToken={null} // Plug in Mapbox token here when ready
-        activeAOI={activeAOI}
-        onClearAOI={() => setActiveAOI(null)}
-        selectedYear={selectedYear}
-      />
-      <AnalyticsCard
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+      <main className="app-stage">
+        {/* 2. 3D Earth Globe & Hotspot Visualizer (Feature 1) */}
+        <GlobeViewer
+          mapboxAccessToken={null} // Plug in Mapbox token here when ready
+          activeAOI={activeAOI}
+          onClearAOI={() => setActiveAOI(null)}
+          selectedYear={selectedYear}
+        />
 
-      {/* 3. Plain-English Threat & Regional Summary Card (Feature 5) */}
-      <SummaryCard
-        activeYear={selectedYear}
-        selectedMonth={selectedMonth}
-        activeAOI={activeAOI}
-      />
+        <div className="dashboard-panels">
+          <AnalyticsCard
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+          />
 
-      {/* 4. 52-Week Burning Activity Calendar & Macro Dock (Feature 2) */}
-      <BurningCalendar
-        selectedYear={selectedYear}
-        activeAOI={activeAOI}
-        onSelectYear={(year) => setSelectedYear(year)}
-        onSelectMonth={(month) => setSelectedMonth(month)}
-      />
+          {/* 3. Plain-English Threat & Regional Summary Card (Feature 5) */}
+          <SummaryCard
+            activeYear={selectedYear}
+            selectedMonth={selectedMonth}
+            activeAOI={activeAOI}
+          />
+        </div>
+
+        {/* 4. 52-Week Burning Activity Calendar & Macro Dock (Feature 2) */}
+        <BurningCalendar
+          selectedYear={selectedYear}
+          activeAOI={activeAOI}
+          onSelectYear={(year) => setSelectedYear(year)}
+          onSelectMonth={(month) => setSelectedMonth(month)}
+        />
+      </main>
     </div>
   );
 }
