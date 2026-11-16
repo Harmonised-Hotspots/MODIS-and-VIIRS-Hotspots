@@ -1,3 +1,55 @@
+.app-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #030509;
+}
+
+.app-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard-panels {
+  display: contents;
+}
+
+@media (max-width: 1023px), (max-height: 639px) {
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-stage {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 16px;
+  }
+
+  .dashboard-panels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    align-items: start;
+  }
+}
+
+@media (max-width: 699px) {
+  .dashboard-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
 .app-container {
   display: flex;
   flex-direction: column;
